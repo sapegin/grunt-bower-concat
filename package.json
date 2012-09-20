@@ -1,0 +1,37 @@
+{
+  "name": "grunt-bower-concat",
+  "description": "Concat wrapper with Bower support.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/sapegin/grunt-bower-concat",
+  "author": {
+    "name": "Artem Sapegin",
+    "url": "http://sapegin.me/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sapegin/grunt-bower-concat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sapegin/grunt-bower-concat/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/sapegin/grunt-bower-concat/blob/master/License.md"
+    }
+  ],
+  "main": "tasks/bower-concat.js",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "bower": "*"
+  },
+  "devDependencies": {
+    "grunt": "*"
+  },
+  "keywords": [
+    "gruntplugin",
+    "bower"
+  ]
+}
