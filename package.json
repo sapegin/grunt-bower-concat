@@ -21,6 +21,9 @@
     }
   ],
   "main": "tasks/bower-concat.js",
+  "scripts": {
+    "test": "grunt"
+  },
   "engines": {
     "node": "*"
   },
