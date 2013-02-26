@@ -5,22 +5,12 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		bower: {
 			all: {
+				dest: 'test/tmp/_bower.js',
 				exclude: 'jquery',
-				dest: 'build/_bower.js',
 				dependencies: {
 					'backbone': 'underscore',
 					'jquery-mousewheel': 'jquery'
 				}
-			}
-		},
-		concat: {
-			test1: {
-				src: [
-					'<%= bower.dest %>',
-					'test/js/utils.js',
-					'test/js/main.js'
-				],
-				dest: 'build/scripts.js'
 			}
 		},
 		nodeunit: {
@@ -48,7 +38,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
-	grunt.registerTask('default', ['jshint', 'clean', 'bower', 'concat', 'nodeunit', 'clean']);
-	//grunt.registerTask('tt', ['bower', 'concat']);
+	grunt.registerTask('default', ['jshint', 'clean', 'bower', 'nodeunit', 'clean']);
 
 };

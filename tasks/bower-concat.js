@@ -9,22 +9,32 @@
 module.exports = function(grunt) {
 	'use strict';
 
-	var fs = require('fs');
 	var path = require('path');
 	var bower = require('bower');
 	var _ = grunt.util._;
 
 	grunt.registerMultiTask('bower', 'Concat wrapper with Bower support.', function() {
-		var done = this.async();
-
 		// Options
+		this.requiresConfig([ this.name, this.target, 'dest' ].join('.'));
+		var dest = this.data.dest;
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
 
+		var done = this.async();
+
 		bowerJavaScripts(function(bowerFiles) {
-			// @todo concat bleat!
-			console.log(bowerFiles);
+			// Read files
+			var src = _.map(bowerFiles, grunt.file.read);
+
+			// Concatenate
+			src = src.join(grunt.util.linefeed);
+
+			// Write result
+			grunt.file.write(dest, src);
+
+			grunt.log.writeln('File "' + dest + '" created.');
+
 			done();
 		}, includes, excludes, dependencies);
 	});
