@@ -4,141 +4,187 @@
  * @author Artem Sapegin (http://sapegin.me)
  */
 
-// @todo Some (bad) components can import other files from main file.
-// @todo References support: <bower:@about>.
-// @todo Dependencies support.
-
 
 /*jshint node:true */
 module.exports = function(grunt) {
 	'use strict';
 
-	// @todo Ditch this when grunt v0.4 is released
-	grunt.util = grunt.util || grunt.utils;
+	var fs = require('fs');
+	var path = require('path');
+	var bower = require('bower');
+	var _ = grunt.util._;
 
-	var fs = require('fs'),
-		path = require('path'),
-		bower = require('bower');
+	grunt.registerMultiTask('bower', 'Concat wrapper with Bower support.', function() {
+		var done = this.async();
 
-	// Override default concat task
-	grunt.renameTask('concat', '_concat');
-	grunt.registerTask('concat', 'bower-concat _concat');
+		// Options
+		var includes = ensureArray(this.data.include || []);
+		var excludes = ensureArray(this.data.exclude || []);
+		var dependencies = this.data.dependencies || {};
 
-	grunt.registerTask('bower-concat', 'Concat wrapper with Bower support.', function() {
-		function process(bowerFiles) {
-			for (var subtaskName in concatConfig) {
-				var subtask = concatConfig[subtaskName],
-					newSrc = [];
-				for (var fileIdx in subtask.src) {
-					var file = subtask.src[fileIdx];
-					if (file.bower) {
-						var filesList = [];
-						for (var fileId in bowerFiles) {
-							if (file.include.length && !inArray(fileId, file.include)) continue;
-							if (file.exclude.length && inArray(fileId, file.exclude)) continue;
-							newSrc.push(path.resolve(bowerFiles[fileId]));
-						}
-					}
-					else {
-						newSrc.push(file);
-					}
-				}
-				subtask.src = newSrc;
-			}
-
-			//console.log(concatConfig)
-
-			grunt.config.set('_concat', concatConfig);
+		bowerJavaScripts(function(bowerFiles) {
+			// @todo concat bleat!
+			console.log(bowerFiles);
 			done();
+		}, includes, excludes, dependencies);
+	});
+
+	function bowerJavaScripts(allDone, includes, excludes, dependencies) {
+		grunt.util.async.parallel({
+			map: bowerList('map'),
+			components: bowerList('paths')
+		}, function(err, lists) {
+			// Combine dependencies list
+			_.each(lists.map, function(component, name) {
+				if (component.dependencies && !dependencies[name]) {
+					dependencies[name] = Object.keys(component.dependencies);
+				}
+			});
+
+			// Convert all dependencies to arrays
+			_.each(dependencies, function(deps, name) {
+				dependencies[name] = ensureArray(deps);
+			});
+
+			// List of main files
+			var jsFiles = {};
+			_.each(lists.components, function(component, name) {
+				if (includes.length && _.indexOf(includes, name) === -1) return;
+				if (excludes.length && _.indexOf(excludes, name) !== -1) return;
+
+				var main = findMainFile(name, component);
+				if (main) {
+					jsFiles[name] = main;
+				}
+				else {
+					grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
+						'You should add it manually to concat task and exclude from bower task build.');
+				}
+			});
+
+			// Sort by dependencies
+			var flatJsFiles = [];
+			_.each(jsFiles, function(file, name) {
+				flatJsFiles.push({name: name, file: file});
+			});
+			flatJsFiles.sort(function(a, b) {
+				if (_.indexOf(dependencies[b.name], a.name) !== -1)
+					return -1;
+				else
+					return 1;
+			});
+
+			// Return flat list of JS files
+			allDone(_.pluck(flatJsFiles, 'file'));
+		});
+	}
+
+	// Should be used inside grunt.util.async.parallel
+	function bowerList(kind) {
+		return function(callback) {
+			var params = {};
+			params[kind] = true;
+			bower.commands.list(params)
+				.on('error', grunt.fatal.bind(grunt.fail))
+				.on('data', function(data) {
+					callback(null, data);  // null means "no error" for async.parallel
+				});
+		};
+	}
+
+	function findMainFile(name, component) {
+		// Bower knows main JS file?
+		var mainFiles = ensureArray(component);
+		var main = _.find(mainFiles, isJsFile);
+		if (main) {
+			return main;
 		}
 
-		var concatConfig = parseConfig(grunt.config.get('concat'));
-		if (!concatConfig) return;
+		// Try to find main JS file
+		var jsFiles = grunt.file.expand(path.join(component, '*.js'));
+		if (jsFiles.length === 1) {
+			// Only one JS file: no doubt it’s main file
+			return jsFiles[0];
+		}
+		else {
+			// More than one JS file: try to guess
+			return guessMainFile(name, jsFiles);
+		}
+	}
 
-		var done = this.async();
-		grunt.helper('bower-list', process);
-	});
+	// Computing Levenshtein distance to guess a main file
+	// Based on https://github.com/curist/grunt-bower
+	function guessMainFile(componentName, files) {
+		var minDist = 1e13;
+		var minDistIndex = -1;
 
-	grunt.registerHelper('bower-list', function(callback) {
-		bower.commands.list({ paths: true })
-			.on('error', grunt.fatal.bind(grunt.fail))
-			.on('data', function(components) {
-				for (var name in components) {
-					var filepath = components[name];
+		files.sort(function(a, b) {
+			// Reverse order by path length
+			return b.length - a.length;
+		});
 
-					if (isJsFile(filepath)) continue;  // Bower knows main file
+		files.forEach(function(filepath, i) {
+			var filename = path.basename(filepath, '.js');
+			var dist = levenshteinDistanceAux(componentName, filename);
+			if (dist <= minDist) {
+				minDist = dist;
+				minDistIndex = i;
+			}
+		});
 
-					var files = fs.readdirSync(filepath),
-						jsFiles = [];
-					for (var fileIdx in files) {
-						var file = files[fileIdx];
-						if (isJsFile(file))
-							jsFiles.push(file);
-					}
+		if (minDistIndex !== -1) {
+			return files[minDistIndex];
+		}
+		else {
+			return undefined;
+		}
+	}
 
-					if (jsFiles.length === 1) {  // Only one JS file: no doubt it main file
-						components[name] = path.join(filepath, jsFiles[0]);
-					}
-					else {
-						// @todo check concat task
-						//grunt.fatal('Bower: can’t detect main file for "' + name + '" component. ' +
-							//'You should add it manually to concat task.');
-					}
-				}
+	// http://en.wikipedia.org/wiki/Levenshtein_distance#Computing_Levenshtein_distance
+	// Borrowed from https://github.com/curist/grunt-bower
+	function levenshteinDistanceAux(str1, str2) {
+		var memo = {};
 
-				callback(components);
-			});
-	});
+		function levenshteinDistance(str1, i, len1, str2, j, len2) {
+			var key = [i, len1, j, len2].join(',');
+			if (memo[key] !== undefined) {
+				return memo[key];
+			}
+
+			if (len1 === 0) {
+				return len2;
+			}
+			if (len2 === 0) {
+				return len1;
+			}
+			
+			var cost = 0;
+			if (str1[i] !== str2[j]) {
+				cost = 1;
+			}
+
+			var dist = Math.min(
+				levenshteinDistance(str1, i+1, len1-1, str2, j, len2) + 1,
+				levenshteinDistance(str1, i, len1, str2, j+1, len2-1) + 1,
+				levenshteinDistance(str1, i+1, len1-1, str2, j+1, len2-1) + cost
+			);
+			memo[key] = dist;
+
+			return dist;
+		}
+
+		return levenshteinDistance(str1, 0, str1.length, str2, 0, str2.length);
+	}
 
 	function isJsFile(filepath) {
-		return path.extname(filepath) === '.js';
+		return typeof filepath === 'string' && path.extname(filepath) === '.js';
 	}
 
-	function parseConfig(cfg) {
-		var found = false;
-		for (var subtaskName in cfg) {
-			var subtask = cfg[subtaskName],
-				src = Array.isArray(subtask.src) ? subtask.src : [subtask.src],
-				newSrc = [];
-			for (var fileIdx in src) {
-				var file = src[fileIdx],
-					m = file.match(/^<bower:([^>]+)>$/);
-				if (m) {
-					found = true;
-					var options = m[1];
-						file = {
-							bower: true,
-							include: [],
-							exclude: []
-						};
-					if (options !== 'all') {
-						options = options.split(/[,; ]+/);
-						for (var optionIdx in options) {
-							var option = options[optionIdx];
-							if (option.slice(0, 1) === '-') {
-								file.exclude.push(option.slice(1));
-							}
-							else {
-								file.include.push(option);
-							}
-						}
-					}
-				}
-				newSrc.push(file);
-			}
-			subtask.src = newSrc;
-		}
-
-		return found ? cfg : null;
-	}
-
-	function inArray(needle, haystack) {
-		for (var key in haystack) {
-			if (haystack[key] === needle) {
-				return true;
-			}
-		}
-		return false;
+	function ensureArray(object) {
+		if (Array.isArray(object))
+			return object;
+		else
+			return [object];
 	}
 
 };
