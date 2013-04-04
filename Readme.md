@@ -1,6 +1,6 @@
 # Bower components concatenator for Grunt [![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
 
-**Experimental** Grunt task for automatically concat all installed [Bower](https://github.com/twitter/bower) components.
+**Experimental**. Grunt task for automatically concat all installed [Bower](https://github.com/twitter/bower) components.
 
 
 ## Installation
@@ -8,7 +8,6 @@
 This plugin requires Grunt 0.4.
 
 ```
-# Sorry, not published to npm yet
 $ npm install grunt-bower-concat --save-dev
 ```
 
@@ -60,7 +59,7 @@ bower: {
 
 ## Release History
 
-### 2013-??-?? v0.1.0
+### 2013-04-05 v0.1.0
 
 * Initial release.
 
