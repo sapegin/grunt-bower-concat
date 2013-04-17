@@ -10,6 +10,16 @@ exports.bower = {
 			'components/underscore/underscore.js',
 			'components/social-likes/social-likes.min.js',
 			'components/jquery-mousewheel/jquery.mousewheel.js',
+			'components/ember-data/packages/ember-data/lib/core.js',
+			'components/ember-data/packages/ember-data/lib/ext.js',
+			'components/ember-data/packages/ember-data/lib/system/store.js',
+			'components/ember-data/packages/ember-data/lib/system/record_arrays.js',
+			'components/ember-data/packages/ember-data/lib/system/model.js',
+			'components/ember-data/packages/ember-data/lib/system/relationships.js',
+			'components/ember-data/packages/ember-data/lib/system/application_ext.js',
+			'components/ember-data/packages/ember-data/lib/system/serializer.js',
+			'components/ember-data/packages/ember-data/lib/system/adapter.js',
+			'components/ember-data/packages/ember-data/lib/adapters.js',
 			'components/backbone/backbone.js'
 		];
 
