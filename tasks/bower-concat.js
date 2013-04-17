@@ -10,7 +10,9 @@ module.exports = function(grunt) {
 	'use strict';
 
 	var path = require('path');
+	var fs = require('fs');
 	var bower = require('bower');
+	var detective = require('detective');
 	var _ = grunt.util._;
 
 	grunt.registerMultiTask('bower', 'Concat wrapper with Bower support.', function() {
@@ -67,25 +69,43 @@ module.exports = function(grunt) {
 					jsFiles[name] = main;
 				}
 				else {
-					grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
-						'You should add it manually to concat task and exclude from bower task build.');
+					// Try to find npm (?) package: packages/_name_/lib/main.js
+					var pkg = findPackageFiles(name, component);
+					if (pkg) {
+						jsFiles[name] = pkg;
+					}
+					else {
+						grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
+							'You should add it manually to concat task and exclude from bower task build.');
+					}
 				}
 			});
 
 			// Sort by dependencies
-			var flatJsFiles = [];
+			var modules = [];
 			_.each(jsFiles, function(file, name) {
-				flatJsFiles.push({name: name, file: file});
+				modules.push({name: name, file: file});
 			});
-			flatJsFiles.sort(function(a, b) {
+			modules.sort(function(a, b) {
 				if (_.indexOf(dependencies[b.name], a.name) !== -1)
 					return -1;
 				else
 					return 1;
 			});
+			modules = _.pluck(modules, 'file');
 
-			// Return flat list of JS files
-			allDone(_.pluck(flatJsFiles, 'file'));
+			// Convert to flat array
+			var flatJsFiles = [];
+			_.each(modules, function(name) {
+				if (typeof name === 'string') {
+					flatJsFiles.push(name);
+				}
+				else {
+					Array.prototype.push.apply(flatJsFiles, name);
+				}
+			});
+
+			allDone(flatJsFiles);
 		});
 	}
 
@@ -118,13 +138,51 @@ module.exports = function(grunt) {
 		}
 		else {
 			// More than one JS file: try to guess
-			return guessMainFile(name, jsFiles);
+			return guessBestFile(name, jsFiles);
+		}
+	}
+
+	function findPackageFiles(name, component) {
+		var pkg = findPackage(name, component);
+		if (!pkg) return null;
+
+		var mainjs = path.join(pkg, 'lib/main.js');
+		if (!fs.existsSync(mainjs)) return null;
+
+		var requires = detective(fs.readFileSync(mainjs));
+		if (!requires.length) return null;
+
+		var pkgName = path.basename(pkg);
+		var files = _.map(requires, function(name) {
+			var filepath = path.join(pkg, 'lib', name.replace(pkgName + '/', '') + '.js');
+			if (fs.existsSync(filepath)) {
+				return filepath;
+			}
+			return null;
+		});
+
+		return files;
+	}
+
+	function findPackage(name, component) {
+		var packages = grunt.file.expand(path.join(component, 'packages/*'));
+		if (packages.length === 0) {
+			// No packages found
+			return null;
+		}
+		else if (packages.length === 1) {
+			// Only one package: return it
+			return packages[0];
+		}
+		else {
+			// More than one package: try to guess
+			return guessBestFile(name, packages);
 		}
 	}
 
 	// Computing Levenshtein distance to guess a main file
 	// Based on https://github.com/curist/grunt-bower
-	function guessMainFile(componentName, files) {
+	function guessBestFile(componentName, files) {
 		var minDist = 1e13;
 		var minDistIndex = -1;
 
@@ -167,7 +225,7 @@ module.exports = function(grunt) {
 			if (len2 === 0) {
 				return len1;
 			}
-			
+
 			var cost = 0;
 			if (str1[i] !== str2[j]) {
 				cost = 1;

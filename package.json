@@ -28,7 +28,8 @@
     "node": "*"
   },
   "dependencies": {
-    "bower": "*"
+    "bower": "*",
+    "detective": "~2.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.0",
