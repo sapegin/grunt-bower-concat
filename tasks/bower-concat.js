@@ -26,15 +26,11 @@ module.exports = function(grunt) {
 		var done = this.async();
 
 		bowerJavaScripts(function(bowerFiles) {
-			// Read files
-			var src = _.map(bowerFiles, grunt.file.read);
-
 			// Concatenate
-			src = src.join(grunt.util.linefeed);
+			var src = bowerFiles.join(grunt.util.linefeed);
 
 			// Write result
 			grunt.file.write(dest, src);
-
 			grunt.log.writeln('File "' + dest + '" created.');
 
 			done();
@@ -66,11 +62,11 @@ module.exports = function(grunt) {
 
 				var main = findMainFile(name, component);
 				if (main) {
-					jsFiles[name] = main;
+					jsFiles[name] = grunt.file.read(main);
 				}
 				else {
 					// Try to find npm (?) package: packages/_name_/lib/main.js
-					var pkg = findPackageFiles(name, component);
+					var pkg = getNpmPackage(name, component);
 					if (pkg) {
 						jsFiles[name] = pkg;
 					}
@@ -94,18 +90,7 @@ module.exports = function(grunt) {
 			});
 			modules = _.pluck(modules, 'file');
 
-			// Convert to flat array
-			var flatJsFiles = [];
-			_.each(modules, function(name) {
-				if (typeof name === 'string') {
-					flatJsFiles.push(name);
-				}
-				else {
-					Array.prototype.push.apply(flatJsFiles, name);
-				}
-			});
-
-			allDone(flatJsFiles);
+			allDone(modules);
 		});
 	}
 
@@ -142,26 +127,14 @@ module.exports = function(grunt) {
 		}
 	}
 
-	function findPackageFiles(name, component) {
+	function getNpmPackage(name, component) {
 		var pkg = findPackage(name, component);
 		if (!pkg) return null;
 
 		var mainjs = path.join(pkg, 'lib/main.js');
 		if (!fs.existsSync(mainjs)) return null;
 
-		var requires = detective(fs.readFileSync(mainjs));
-		if (!requires.length) return null;
-
-		var pkgName = path.basename(pkg);
-		var files = _.map(requires, function(name) {
-			var filepath = path.join(pkg, 'lib', name.replace(pkgName + '/', '') + '.js');
-			if (fs.existsSync(filepath)) {
-				return filepath;
-			}
-			return null;
-		});
-
-		return files;
+		return requirePackage(pkg, mainjs);
 	}
 
 	function findPackage(name, component) {
@@ -178,6 +151,27 @@ module.exports = function(grunt) {
 			// More than one package: try to guess
 			return guessBestFile(name, packages);
 		}
+	}
+
+	function requirePackage(pkg, mainjs) {
+		var processed = {};
+		var pkgName = path.basename(pkg);
+		var code = grunt.file.read(mainjs);
+		while (true) {
+			var requires = detective(code);
+			if (!requires.length) break;
+			for (var requireIdx in requires) {
+				var name = requires[requireIdx];
+				var requiredCode = '';
+				if (!processed[name]) {
+					var filepath = path.join(pkg, 'lib', name.replace(pkgName + '/', '') + '.js');
+					requiredCode = grunt.file.read(filepath);
+					processed[name] = true;
+				}
+				code = code.replace(new RegExp('require\\([\\\'\"]' + name + '[\\\'\"]\\);?'), requiredCode);
+			}
+		}
+		return code;
 	}
 
 	// Computing Levenshtein distance to guess a main file
