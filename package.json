@@ -1,7 +1,7 @@
 {
   "name": "grunt-bower-concat",
   "description": "Bower components concatenator for Grunt.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/sapegin/grunt-bower-concat",
   "author": {
     "name": "Artem Sapegin",
