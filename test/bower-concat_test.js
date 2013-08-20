@@ -7,20 +7,10 @@ exports.bower = {
 	test1: function(test) {
 		var dest = 'test/tmp/_bower.js';
 		var files = [
-			'components/underscore/underscore.js',
-			'components/social-likes/social-likes.min.js',
-			'components/jquery-mousewheel/jquery.mousewheel.js',
-			'components/ember-data/packages/ember-data/lib/core.js',
-			'components/ember-data/packages/ember-data/lib/ext.js',
-			'components/ember-data/packages/ember-data/lib/system/store.js',
-			'components/ember-data/packages/ember-data/lib/system/record_arrays.js',
-			'components/ember-data/packages/ember-data/lib/system/model.js',
-			'components/ember-data/packages/ember-data/lib/system/relationships.js',
-			'components/ember-data/packages/ember-data/lib/system/application_ext.js',
-			'components/ember-data/packages/ember-data/lib/system/serializer.js',
-			'components/ember-data/packages/ember-data/lib/system/adapter.js',
-			'components/ember-data/packages/ember-data/lib/adapters.js',
-			'components/backbone/backbone.js'
+			'bower_components/underscore/underscore.js',
+			'bower_components/social-likes/social-likes.min.js',
+			'bower_components/jquery-mousewheel/jquery.mousewheel.js',
+			'bower_components/backbone/backbone.js'
 		];
 
 		// Destination file exists

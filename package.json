@@ -29,13 +29,14 @@
   },
   "dependencies": {
     "bower": "*",
-    "detective": "~2.1.0"
+    "detective": "~2.1.2"
   },
   "devDependencies": {
-    "grunt": "~0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-nodeunit": "~0.1.2",
-    "grunt-contrib-clean": "~0.4.0"
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-clean": "~0.5.0",
+    "bower": "~1.2.1"
   },
   "peerDependencies": {
     "grunt": "~0.4.0"
