@@ -27,7 +27,6 @@ module.exports = function(grunt) {
 
 		bowerJavaScripts(function(bowerFiles) {
 			// Concatenate
-
 			var src = bowerFiles.join(grunt.util.linefeed);
 
 			// Write result
