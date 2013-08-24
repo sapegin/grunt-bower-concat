@@ -27,6 +27,7 @@ module.exports = function(grunt) {
 
 		bowerJavaScripts(function(bowerFiles) {
 			// Concatenate
+
 			var src = bowerFiles.join(grunt.util.linefeed);
 
 			// Write result
@@ -57,7 +58,7 @@ module.exports = function(grunt) {
 			// List of main files
 			var jsFiles = {};
 			_.each(lists.components, function(component, name) {
-				if (includes.length && _.indexOf(includes, name) === -1) return;
+				if (includes.length && _.indexOf(includes, name) !== -1) return;
 				if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
 				var main = findMainFile(name, component);
@@ -76,6 +77,13 @@ module.exports = function(grunt) {
 					}
 				}
 			});
+
+      // List of includes
+      _.each(includes, function(include) {
+        if(grunt.file.exists(include)) {
+          jsFiles[include] = grunt.file.read(include);
+        }
+      });
 
 			// Sort by dependencies
 			var modules = [];
