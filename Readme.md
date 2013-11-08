@@ -61,14 +61,6 @@ bower_concat: {
 
 The changelog can be found in the Changelog.md file.
 
-### 2013-08-20 v0.1.1
-
-* Bugfixes.
-
-### 2013-04-05 v0.1.0
-
-* Initial release.
-
 ---
 
 ## License
