@@ -28,15 +28,14 @@
     "node": "*"
   },
   "dependencies": {
-    "bower": "*",
+    "bower": "~1.2.7",
     "detective": "~2.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-jshint": "~0.7.1",
     "grunt-contrib-clean": "~0.5.0",
     "grunt-mocha-test": "~0.7.0",
-    "bower": "~1.2.1",
     "matchdep": "~0.3.0"
   },
   "peerDependencies": {
