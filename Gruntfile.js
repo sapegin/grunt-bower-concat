@@ -3,7 +3,7 @@ module.exports = function(grunt) {
 	'use strict';
 
 	grunt.initConfig({
-		bower: {
+		bower_concat: {
 			all: {
 				dest: 'test/tmp/_bower.js',
 				exclude: 'jquery',
@@ -31,6 +31,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-nodeunit');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 
-	grunt.registerTask('default', ['jshint', 'clean', 'bower', 'nodeunit', 'clean']);
+	grunt.registerTask('default', ['jshint', 'clean', 'bower_concat', 'nodeunit', 'clean']);
 
 };

@@ -1,5 +1,5 @@
 /**
- * Concat wrapper with Bower support
+ * Concatenate installed Bower packages
  *
  * @author Artem Sapegin (http://sapegin.me)
  */
@@ -15,7 +15,7 @@ module.exports = function(grunt) {
 	var detective = require('detective');
 	var _ = grunt.util._;
 
-	grunt.registerMultiTask('bower', 'Concat wrapper with Bower support.', function() {
+	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
 		// Options
 		this.requiresConfig([ this.name, this.target, 'dest' ].join('.'));
 		var dest = this.data.dest;

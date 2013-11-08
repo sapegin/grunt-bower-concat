@@ -20,7 +20,7 @@ Add somewhere in your `Gruntfile.js`:
 grunt.loadNpmTasks('grunt-bower-concat');
 ```
 
-Inside your `Gruntfile.js` file add a section named `bower`. See Parameters section below for details.
+Inside your `Gruntfile.js` file add a section named `bower_concat`. See Parameters section below for details.
 
 
 ### Parameters
@@ -35,7 +35,7 @@ List of components you want to exclude.
 
 #### [include] `String|Array`
 
-By default `bower-concat` include all installed in project components. Using `include` option you can manually specify which components should be included.
+By default bower-concat include all installed in project components. Using `include` option you can manually specify which components should be included.
 
 ### [dependencies] `Object`
 
@@ -45,7 +45,7 @@ Unfortunately not all Bower components list their dependencies. If comoponents c
 ### Config Example
 
 ``` javascript
-bower: {
+bower_concat: {
   all: {
     dest: 'build/_bower.js',
     exclude: 'jquery'
