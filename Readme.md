@@ -57,7 +57,9 @@ bower_concat: {
 }
 ```
 
-## Release History
+## Changelog
+
+The changelog can be found in the Changelog.md file.
 
 ### 2013-08-20 v0.1.1
 

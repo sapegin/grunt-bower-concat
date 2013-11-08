@@ -34,9 +34,10 @@
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.3",
-    "grunt-contrib-nodeunit": "~0.2.0",
     "grunt-contrib-clean": "~0.5.0",
-    "bower": "~1.2.1"
+    "grunt-mocha-test": "~0.7.0",
+    "bower": "~1.2.1",
+    "matchdep": "~0.3.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.0"

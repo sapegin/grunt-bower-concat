@@ -2,6 +2,8 @@
 module.exports = function(grunt) {
 	'use strict';
 
+	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
 	grunt.initConfig({
 		bower_concat: {
 			all: {
@@ -13,8 +15,13 @@ module.exports = function(grunt) {
 				}
 			}
 		},
-		nodeunit: {
-			all: ['test/bower-concat_test.js']
+		mochaTest: {
+			test: {
+				options: {
+					reporter: 'spec'
+				},
+				src: ['test/*.js']
+			}
 		},
 		jshint: {
 			all: 'tasks/*.js',
@@ -27,10 +34,7 @@ module.exports = function(grunt) {
 
 	grunt.loadTasks('tasks');
 
-	grunt.loadNpmTasks('grunt-contrib-jshint');
-	grunt.loadNpmTasks('grunt-contrib-nodeunit');
-	grunt.loadNpmTasks('grunt-contrib-clean');
-
-	grunt.registerTask('default', ['jshint', 'clean', 'bower_concat', 'nodeunit', 'clean']);
+	grunt.registerTask('test', ['mochaTest']);
+	grunt.registerTask('default', ['jshint', 'clean', 'bower_concat', 'test', 'clean']);
 
 };
