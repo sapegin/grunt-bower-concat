@@ -18,6 +18,7 @@ exports.bower = {
 
 		// Concatenation works
 		var expected = grunt.util._.map(files, grunt.file.read).join(grunt.util.linefeed);
+		// grunt.file.write('test/tmp/exp.js', expected);
 		var actual = grunt.file.read(dest);
 		test.equal(actual, expected, 'Concatenatenation works.');
 

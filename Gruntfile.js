@@ -17,7 +17,7 @@ module.exports = function(grunt) {
 			all: ['test/bower-concat_test.js']
 		},
 		jshint: {
-			all: ['Gruntfile.js', 'tasks/*.js', 'test/*.js'],
+			all: 'tasks/*.js',
 			options: {
 				jshintrc: '.jshintrc'
 			}
