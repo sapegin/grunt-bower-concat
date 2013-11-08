@@ -36,5 +36,5 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('test', ['mochaTest']);
 	grunt.registerTask('default', ['jshint', 'clean', 'bower_concat', 'test', 'clean']);
-
+	grunt.registerTask('build', ['default']);
 };
