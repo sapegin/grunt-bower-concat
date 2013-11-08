@@ -22,6 +22,7 @@ module.exports = function(grunt) {
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
+		var bowerOptions = this.data.bowerOptions || {};
 
 		var done = this.async();
 
@@ -34,13 +35,13 @@ module.exports = function(grunt) {
 			grunt.log.writeln('File "' + dest + '" created.');
 
 			done();
-		}, includes, excludes, dependencies);
+		}, includes, excludes, dependencies, bowerOptions);
 	});
 
-	function bowerJavaScripts(allDone, includes, excludes, dependencies) {
+	function bowerJavaScripts(allDone, includes, excludes, dependencies, bowerOptions) {
 		grunt.util.async.parallel({
-			map: bowerList('map'),
-			components: bowerList('paths')
+			map: bowerList('map', bowerOptions),
+			components: bowerList('paths', bowerOptions)
 		}, function(err, lists) {
 			// Combine dependencies list
 			_.each(lists.map, function(component, name) {
@@ -95,10 +96,12 @@ module.exports = function(grunt) {
 	}
 
 	// Should be used inside grunt.util.async.parallel
-	function bowerList(kind) {
+	function bowerList(kind, bowerOptions) {
 		return function(callback) {
 			var params = {};
 			params[kind] = true;
+			_.extend(params, bowerOptions);
+
 			bower.commands.list(params)
 				.on('error', grunt.fatal.bind(grunt.fail))
 				.on('end', function(data) {
