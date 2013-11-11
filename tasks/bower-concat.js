@@ -98,9 +98,8 @@ module.exports = function(grunt) {
 	// Should be used inside grunt.util.async.parallel
 	function bowerList(kind, bowerOptions) {
 		return function(callback) {
-			var params = {};
+			var params = _.extend({}, bowerOptions);
 			params[kind] = true;
-			_.extend(params, bowerOptions);
 
 			bower.commands.list(params)
 				.on('error', grunt.fatal.bind(grunt.fail))
