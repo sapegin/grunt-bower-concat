@@ -114,14 +114,14 @@ module.exports = function(grunt) {
 		// Build dependency graph:
 		if(map.dependencies) {
 			dependencyTools.buildDependencyGraph(
-				undefined,    // first recursion without a start value
+				undefined,			// first recursion without a start value
 				map.dependencies,
 				dependencyGraph
 			);
 
 			// Flatten/resolve the dependency tree:
 			dependencyTools.resolveDependencyGraph(
-				undefined, 		// first recursion without a start value
+				undefined,			// first recursion without a start value
 				resolved,
 				unresolved,
 				dependencyGraph
