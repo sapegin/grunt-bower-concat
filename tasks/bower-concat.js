@@ -14,6 +14,7 @@ module.exports = function(grunt) {
 	var bower = require('bower');
 	var detective = require('detective');
 	var _ = grunt.util._;
+	var dependencyTools = require('../lib/dependencyTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
 		// Options
@@ -42,17 +43,19 @@ module.exports = function(grunt) {
 			map: bowerList('map'),
 			components: bowerList('paths')
 		}, function(err, lists) {
-			// Combine dependencies list
-			_.each(lists.map, function(component, name) {
-				if (component.dependencies && !dependencies[name]) {
-					dependencies[name] = Object.keys(component.dependencies);
-				}
-			});
+			// Ensure all manuel defined dependencies are contained in an array:
+			if(dependencies) {
+				_.map(dependencies, function(value, key) {
+					dependencies[key] = ensureArray(value);
+				});
+			}
 
-			// Convert all dependencies to arrays
-			_.each(dependencies, function(deps, name) {
-				dependencies[name] = ensureArray(deps);
-			});
+			// Resolve dependency graph to ensure correct order of components
+			// when concat them:
+			var resolvedDependencies = resolveDependencies(
+				lists.map,
+				dependencies
+			);
 
 			// List of main files
 			var jsFiles = {};
@@ -77,18 +80,14 @@ module.exports = function(grunt) {
 				}
 			});
 
-			// Sort by dependencies
+			// Gather JavaScript files by respecting the order of resolved
+			// dependencies:
 			var modules = [];
-			_.each(jsFiles, function(file, name) {
-				modules.push({name: name, file: file});
+			_.each(resolvedDependencies, function(name) {
+				if(jsFiles[name]) {
+					modules.push(jsFiles[name]);
+				}
 			});
-			modules.sort(function(a, b) {
-				if (_.indexOf(dependencies[b.name], a.name) !== -1)
-					return -1;
-				else
-					return 1;
-			});
-			modules = _.pluck(modules, 'file');
 
 			allDone(modules);
 		});
@@ -105,6 +104,31 @@ module.exports = function(grunt) {
 					callback(null, data);  // null means "no error" for async.parallel
 				});
 		};
+	}
+
+	function resolveDependencies(map, manualDependencies) {
+		var dependencyGraph = manualDependencies || {};
+		var resolved = [];
+		var unresolved = [];
+
+		// Build dependency graph:
+		if(map.dependencies) {
+			dependencyTools.buildDependencyGraph(
+				undefined,			// first recursion without a start value
+				map.dependencies,
+				dependencyGraph
+			);
+
+			// Flatten/resolve the dependency tree:
+			dependencyTools.resolveDependencyGraph(
+				undefined,			// first recursion without a start value
+				resolved,
+				unresolved,
+				dependencyGraph
+			);
+		}
+
+		return resolved;
 	}
 
 	function findMainFile(name, component) {
@@ -238,15 +262,15 @@ module.exports = function(grunt) {
 		return levenshteinDistance(str1, 0, str1.length, str2, 0, str2.length);
 	}
 
-	function isJsFile(filepath) {
-		return typeof filepath === 'string' && path.extname(filepath) === '.js';
-	}
-
 	function ensureArray(object) {
-		if (Array.isArray(object))
+		if(Array.isArray(object))
 			return object;
 		else
 			return [object];
+	}
+
+	function isJsFile(filepath) {
+		return typeof filepath === 'string' && path.extname(filepath) === '.js';
 	}
 
 };
