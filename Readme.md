@@ -41,6 +41,10 @@ By default bower-concat include all installed in project components. Using `incl
 
 Unfortunately not all Bower components list their dependencies. If comoponents concatenates in wrong order use this option to manually specify dependencies for some components.
 
+### [bowerOptions] `Object`
+
+Bower specific options that will be passed in during the bower.commands calls. i.e. relative: false
+
 
 ### Config Example
 
@@ -52,6 +56,9 @@ bower_concat: {
     dependencies: {
       'backbone': 'underscore',
       'jquery-mousewheel': 'jquery'
+    },
+    bowerOptions: {
+      relative: false
     }
   }
 }
