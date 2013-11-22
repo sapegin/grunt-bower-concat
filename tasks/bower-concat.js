@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
 		// Options
-		this.requiresConfig([ this.name, this.target, 'dest' ].join('.'));
+		this.requiresConfig([this.name, this.target, 'dest'].join('.'));
 		var dest = this.data.dest;
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
@@ -43,19 +43,15 @@ module.exports = function(grunt) {
 			map: bowerList('map'),
 			components: bowerList('paths')
 		}, function(err, lists) {
-			// Ensure all manuel defined dependencies are contained in an array:
-			if(dependencies) {
+			// Ensure all manual defined dependencies are contained in an array
+			if (dependencies) {
 				_.map(dependencies, function(value, key) {
 					dependencies[key] = ensureArray(value);
 				});
 			}
 
-			// Resolve dependency graph to ensure correct order of components
-			// when concat them:
-			var resolvedDependencies = resolveDependencies(
-				lists.map,
-				dependencies
-			);
+			// Resolve dependency graph to ensure correct order of components when concat them
+			var resolvedDependencies = resolveDependencies(lists.map, dependencies);
 
 			// List of main files
 			var jsFiles = {};
@@ -80,11 +76,10 @@ module.exports = function(grunt) {
 				}
 			});
 
-			// Gather JavaScript files by respecting the order of resolved
-			// dependencies:
+			// Gather JavaScript files by respecting the order of resolved dependencies
 			var modules = [];
 			_.each(resolvedDependencies, function(name) {
-				if(jsFiles[name]) {
+				if (jsFiles[name]) {
 					modules.push(jsFiles[name]);
 				}
 			});
@@ -112,16 +107,16 @@ module.exports = function(grunt) {
 		var unresolved = [];
 
 		// Build dependency graph:
-		if(map.dependencies) {
+		if (map.dependencies) {
 			dependencyTools.buildDependencyGraph(
-				undefined,			// first recursion without a start value
+				undefined,  // First recursion without a start value
 				map.dependencies,
 				dependencyGraph
 			);
 
 			// Flatten/resolve the dependency tree:
 			dependencyTools.resolveDependencyGraph(
-				undefined,			// first recursion without a start value
+				undefined,  // First recursion without a start value
 				resolved,
 				unresolved,
 				dependencyGraph
@@ -263,7 +258,7 @@ module.exports = function(grunt) {
 	}
 
 	function ensureArray(object) {
-		if(Array.isArray(object))
+		if (Array.isArray(object))
 			return object;
 		else
 			return [object];
