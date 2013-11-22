@@ -13,7 +13,7 @@ module.exports = function(grunt) {
 	var fs = require('fs');
 	var bower = require('bower');
 	var detective = require('detective');
-	var _ = grunt.util._;
+	var _ = require('lodash');
 	var dependencyTools = require('../lib/dependencyTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
