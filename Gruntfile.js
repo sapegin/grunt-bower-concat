@@ -24,10 +24,19 @@ module.exports = function(grunt) {
 			}
 		},
 		jshint: {
-			all: ['tasks/**/*.js', 'lib/**/*.js'],
 			options: {
 				jshintrc: '.jshintrc'
-			}
+			},
+			all: [
+				'tasks/**/*.js',
+				'lib/**/*.js'
+			],
+		},
+		jscs: {
+			all: [
+				'tasks/**/*.js',
+				'lib/**/*.js'
+			],
 		},
 		clean: ['test/tmp']
 	});
@@ -35,6 +44,6 @@ module.exports = function(grunt) {
 	grunt.loadTasks('tasks');
 
 	grunt.registerTask('test', ['mochaTest']);
-	grunt.registerTask('default', ['jshint', 'clean', 'bower_concat', 'test', 'clean']);
+	grunt.registerTask('default', ['jshint', 'jscs', 'clean', 'bower_concat', 'test', 'clean']);
 	grunt.registerTask('build', ['default']);
 };
