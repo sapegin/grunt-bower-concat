@@ -1,6 +1,6 @@
 {
   "name": "grunt-bower-concat",
-  "description": "Bower components concatenator for Grunt.",
+  "description": "Automatic concatenation of installed Bower components in right order.",
   "version": "0.1.2",
   "homepage": "https://github.com/sapegin/grunt-bower-concat",
   "author": {
