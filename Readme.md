@@ -1,6 +1,6 @@
 # Bower components concatenator for Grunt [![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
 
-**Experimental**. Grunt task for automatically concat all installed [Bower](https://github.com/twitter/bower) components.
+Automatic concatenation of installed [Bower](https://github.com/twitter/bower) components in right order.
 
 
 ## Installation
@@ -25,25 +25,62 @@ Inside your `Gruntfile.js` file add a section named `bower_concat`. See Paramete
 
 ### Parameters
 
-#### dest `String`
+#### dest
+
+Type: `String`.
 
 Name of file where result of concatenation will be saved.
 
-#### [exclude] `String|Array`
+#### exclude
+
+Type: `String|Array`, optional.
 
 List of components you want to exclude.
 
-#### [include] `String|Array`
+```js
+exclude: [
+	'jquery',
+	'modernizr'
+]
+```
 
-By default bower-concat include all installed in project components. Using `include` option you can manually specify which components should be included.
+#### include
 
-### [dependencies] `Object`
+Type: `String|Array`, optional.
 
-Unfortunately not all Bower components list their dependencies. If comoponents concatenates in wrong order use this option to manually specify dependencies for some components.
+By default bower-concat will include all installed in project components. Using `include` option you can manually specify which components should be included.
 
-### [bowerOptions] `Object`
+```js
+include: [
+	'underscore',
+	'backbone'
+]
+```
 
-Bower specific options that will be passed in during the bower.commands calls. i.e. relative: false
+### dependencies
+
+Type: `Object`, optional.
+
+Unfortunately not all Bower components list their dependencies. If comoponents concatenates in wrong order use this option to manually specify dependencies for that components.
+
+```js
+dependencies: {
+  'underscore': 'jquery',
+  'mygallery': ['jquery', 'fotorama']
+}
+```
+
+### bowerOptions
+
+Type: `Object`, optional.
+
+Bower specific options that will be passed in during the bower.commands calls.
+
+```js
+bowerOptions: {
+  relative: false
+}
+```
 
 
 ### Config Example
@@ -52,8 +89,12 @@ Bower specific options that will be passed in during the bower.commands calls. i
 bower_concat: {
   all: {
     dest: 'build/_bower.js',
-    exclude: 'jquery'
+    exclude: [
+    	'jquery',
+    	'modernizr'
+    ],
     dependencies: {
+      'underscore': 'jquery',
       'backbone': 'underscore',
       'jquery-mousewheel': 'jquery'
     },
