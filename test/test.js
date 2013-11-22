@@ -8,9 +8,9 @@ describe('grunt-bower-concat', function() {
 	var dest = 'test/tmp/_bower.js';
 	var files = [
 		'bower_components/underscore/underscore.js',
-		'bower_components/social-likes/social-likes.min.js',
+		'bower_components/backbone/backbone.js',
 		'bower_components/jquery-mousewheel/jquery.mousewheel.js',
-		'bower_components/backbone/backbone.js'
+		'bower_components/social-likes/social-likes.min.js'
 	];
 
 	it('Should create destination file.', function() {
