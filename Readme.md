@@ -57,7 +57,7 @@ include: [
 ]
 ```
 
-### dependencies
+#### dependencies
 
 Type: `Object`, optional.
 
@@ -70,7 +70,7 @@ dependencies: {
 }
 ```
 
-### bowerOptions
+#### bowerOptions
 
 Type: `Object`, optional.
 
