@@ -30,7 +30,8 @@
   "dependencies": {
     "bower": "~1.2.7",
     "detective": "~2.1.2",
-    "lodash": "~2.3.0"
+    "lodash": "~2.3.0",
+    "underscore.string": "~2.3.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
