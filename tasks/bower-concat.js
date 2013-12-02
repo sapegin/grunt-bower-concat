@@ -135,7 +135,7 @@ module.exports = function(grunt) {
 		// Bower knows main JS file?
 		var mainFiles = ensureArray(component);
 		var mainJSFiles = _.filter(mainFiles, isJsFile);
-		if (mainJSFiles) {
+		if (mainJSFiles.length) {
 			return mainJSFiles;
 		}
 
