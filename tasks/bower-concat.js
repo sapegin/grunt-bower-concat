@@ -61,9 +61,11 @@ module.exports = function(grunt) {
 				if (includes.length && _.indexOf(includes, name) === -1) return;
 				if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
-				var main = findMainFile(name, component);
-				if (main) {
-					jsFiles[name] = grunt.file.read(main);
+				var mainFiles = findMainFiles(name, component);
+				if (mainFiles) {
+					jsFiles[name] = mainFiles.map(function(file) {
+						return grunt.file.read(file);
+					});
 				}
 				else {
 					// Try to find npm (?) package: packages/_name_/lib/main.js
@@ -82,7 +84,7 @@ module.exports = function(grunt) {
 			var modules = [];
 			_.each(resolvedDependencies, function(name) {
 				if (jsFiles[name]) {
-					modules.push(jsFiles[name]);
+					modules = modules.concat(jsFiles[name]);
 				}
 			});
 
@@ -129,23 +131,23 @@ module.exports = function(grunt) {
 		return resolved;
 	}
 
-	function findMainFile(name, component) {
+	function findMainFiles(name, component) {
 		// Bower knows main JS file?
 		var mainFiles = ensureArray(component);
-		var main = _.find(mainFiles, isJsFile);
-		if (main) {
-			return main;
+		var mainJSFiles = _.filter(mainFiles, isJsFile);
+		if (mainJSFiles) {
+			return mainJSFiles;
 		}
 
 		// Try to find main JS file
 		var jsFiles = grunt.file.expand(path.join(component, '*.js'));
 		if (jsFiles.length === 1) {
 			// Only one JS file: no doubt it’s main file
-			return jsFiles[0];
+			return jsFiles;
 		}
 		else {
 			// More than one JS file: try to guess
-			return guessBestFile(name, jsFiles);
+			return [guessBestFile(name, jsFiles)];
 		}
 	}
 
