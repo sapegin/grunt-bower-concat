@@ -141,6 +141,12 @@ module.exports = function(grunt) {
 
 		// Try to find main JS file
 		var jsFiles = grunt.file.expand(path.join(component, '*.js'));
+
+		// Skip Gruntfiles
+		jsFiles = _.filter(jsFiles, function(filepath) {
+			return !/(Gruntfile\.js)|(grunt\.js)$/.test(filepath);
+		});
+
 		if (jsFiles.length === 1) {
 			// Only one JS file: no doubt it’s main file
 			return jsFiles;
