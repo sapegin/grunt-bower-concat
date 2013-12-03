@@ -246,7 +246,7 @@ module.exports = function(grunt) {
 	}
 
 	function isJsFile(filepath) {
-		return typeof filepath === 'string' && path.extname(filepath) === '.js';
+		return typeof filepath === 'string' && fs.lstatSync(filepath).isFile() && path.extname(filepath) === '.js';
 	}
 
 };
