@@ -10,7 +10,8 @@ describe('grunt-bower-concat', function() {
 		'bower_components/underscore/underscore.js',
 		'bower_components/backbone/backbone.js',
 		'bower_components/jquery-mousewheel/jquery.mousewheel.js',
-		'bower_components/social-likes/social-likes.min.js'
+		'bower_components/social-likes/social-likes.min.js',
+		'bower_components/svg.js/dist/svg.js'
 	];
 
 	it('Should create destination file.', function() {

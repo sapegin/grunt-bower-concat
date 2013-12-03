@@ -70,6 +70,19 @@ dependencies: {
 }
 ```
 
+#### mainFiles
+
+Type: `Object`, optional.
+
+Some Bower components don’t list their main files or (more likely) don’t have `bower.json` file at all. In this case `bower-concat` will try to guess main file but sometimes it can’t or choose wrong one. You could explicitly define main files for that components.
+
+```js
+mainFiles: {
+  'svg.js': 'dist/svg.js',
+  'mygallery': ['src/base.js', 'src/gallery.js']
+}
+```
+
 #### bowerOptions
 
 Type: `Object`, optional.

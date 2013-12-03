@@ -24,6 +24,7 @@ module.exports = function(grunt) {
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
+		var mains = this.data.mainFiles || {};
 		var bowerOptions = this.data.bowerOptions || {};
 
 		var done = this.async();
@@ -73,8 +74,10 @@ module.exports = function(grunt) {
 							jsFiles[name] = pkg;
 						}
 						else {
-							grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
-								'You should add it manually to concat task and exclude from bower task build.');
+							grunt.fatal('Can’t detect main file for "' + name + '" component. ' +
+								'You should explicitly define it via bower_concat’s mainFiles option. ' +
+								'See Readme for details.'
+								);
 						}
 					}
 				});
@@ -131,6 +134,15 @@ module.exports = function(grunt) {
 		}
 
 		function findMainFiles(name, component) {
+			// Main file explicitly defined in bower_concat options
+			if (mains[name]) {
+				var manualMainFiles = ensureArray(mains[name]);
+				manualMainFiles = _.map(manualMainFiles, function(filepath) {
+					return path.join(component, filepath);
+				});
+				return manualMainFiles;
+			}
+
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
 			var mainJSFiles = _.filter(mainFiles, isJsFile);

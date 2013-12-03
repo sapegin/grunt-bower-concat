@@ -12,6 +12,9 @@ module.exports = function(grunt) {
 				dependencies: {
 					'backbone': 'underscore',
 					'jquery-mousewheel': 'jquery'
+				},
+				mainFiles: {
+				  'svg.js': 'dist/svg.js'
 				}
 			}
 		},
