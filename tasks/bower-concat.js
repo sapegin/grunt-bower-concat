@@ -62,7 +62,7 @@ module.exports = function(grunt) {
 				if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
 				var mainFiles = findMainFiles(name, component);
-				if (mainFiles) {
+				if (mainFiles.length) {
 					jsFiles[name] = mainFiles.map(function(file) {
 						return grunt.file.read(file);
 					});
@@ -153,7 +153,13 @@ module.exports = function(grunt) {
 		}
 		else {
 			// More than one JS file: try to guess
-			return [guessBestFile(name, jsFiles)];
+			var bestFile = guessBestFile(name, jsFiles);
+			if (bestFile) {
+				return [bestFile];
+			}
+			else {
+				return [];
+			}
 		}
 	}
 
