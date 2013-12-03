@@ -35,7 +35,7 @@ module.exports = function(grunt) {
 
 			// Write result
 			grunt.file.write(dest, src);
-			grunt.log.writeln('File "' + dest + '" created.');
+			grunt.log.writeln('File ' + dest.cyan + ' created.');
 
 			done();
 		});
