@@ -37,216 +37,216 @@ module.exports = function(grunt) {
 			grunt.log.writeln('File "' + dest + '" created.');
 
 			done();
-		}, includes, excludes, dependencies, bowerOptions);
-	});
+		});
 
-	function bowerJavaScripts(allDone, includes, excludes, dependencies, bowerOptions) {
-		grunt.util.async.parallel({
-			map: bowerList('map', bowerOptions),
-			components: bowerList('paths', bowerOptions)
-		}, function(err, lists) {
-			// Ensure all manual defined dependencies are contained in an array
-			if (dependencies) {
-				_.map(dependencies, function(value, key) {
-					dependencies[key] = ensureArray(value);
-				});
-			}
-
-			// Resolve dependency graph to ensure correct order of components when concat them
-			var resolvedDependencies = resolveDependencies(lists.map, dependencies);
-
-			// List of main files
-			var jsFiles = {};
-			_.each(lists.components, function(component, name) {
-				if (includes.length && _.indexOf(includes, name) === -1) return;
-				if (excludes.length && _.indexOf(excludes, name) !== -1) return;
-
-				var mainFiles = findMainFiles(name, component);
-				if (mainFiles.length) {
-					jsFiles[name] = mainFiles.map(function(file) {
-						return grunt.file.read(file);
+		function bowerJavaScripts(allDone) {
+			grunt.util.async.parallel({
+				map: bowerList('map'),
+				components: bowerList('paths')
+			}, function(err, lists) {
+				// Ensure all manual defined dependencies are contained in an array
+				if (dependencies) {
+					_.map(dependencies, function(value, key) {
+						dependencies[key] = ensureArray(value);
 					});
 				}
-				else {
-					// Try to find npm (?) package: packages/_name_/lib/main.js
-					var pkg = getNpmPackage(name, component);
-					if (pkg) {
-						jsFiles[name] = pkg;
+
+				// Resolve dependency graph to ensure correct order of components when concat them
+				var resolvedDependencies = resolveDependencies(lists.map);
+
+				// List of main files
+				var jsFiles = {};
+				_.each(lists.components, function(component, name) {
+					if (includes.length && _.indexOf(includes, name) === -1) return;
+					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
+
+					var mainFiles = findMainFiles(name, component);
+					if (mainFiles.length) {
+						jsFiles[name] = mainFiles.map(function(file) {
+							return grunt.file.read(file);
+						});
 					}
 					else {
-						grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
-							'You should add it manually to concat task and exclude from bower task build.');
+						// Try to find and concat minispade package: packages/_name_/lib/main.js
+						var pkg = getNpmPackage(name, component);
+						if (pkg) {
+							jsFiles[name] = pkg;
+						}
+						else {
+							grunt.fatal('Bower: can’t detect main file for "' + name + '" component.' +
+								'You should add it manually to concat task and exclude from bower task build.');
+						}
 					}
-				}
-			});
-
-			// Gather JavaScript files by respecting the order of resolved dependencies
-			var modules = [];
-			_.each(resolvedDependencies, function(name) {
-				if (jsFiles[name]) {
-					modules = modules.concat(jsFiles[name]);
-				}
-			});
-
-			allDone(modules);
-		});
-	}
-
-	// Should be used inside grunt.util.async.parallel
-	function bowerList(kind, bowerOptions) {
-		return function(callback) {
-			var params = _.extend({}, bowerOptions);
-			params[kind] = true;
-
-			bower.commands.list(params)
-				.on('error', grunt.fatal.bind(grunt.fail))
-				.on('end', function(data) {
-					callback(null, data);  // null means "no error" for async.parallel
 				});
-		};
-	}
 
-	function resolveDependencies(map, manualDependencies) {
-		var dependencyGraph = manualDependencies || {};
-		var resolved = [];
-		var unresolved = [];
+				// Gather JavaScript files by respecting the order of resolved dependencies
+				var modules = [];
+				_.each(resolvedDependencies, function(name) {
+					if (jsFiles[name]) {
+						modules = modules.concat(jsFiles[name]);
+					}
+				});
 
-		// Build dependency graph:
-		if (map.dependencies) {
-			dependencyTools.buildDependencyGraph(
-				undefined,  // First recursion without a start value
-				map.dependencies,
-				dependencyGraph
-			);
-
-			// Flatten/resolve the dependency tree:
-			dependencyTools.resolveDependencyGraph(
-				undefined,  // First recursion without a start value
-				resolved,
-				unresolved,
-				dependencyGraph
-			);
+				allDone(modules);
+			});
 		}
 
-		return resolved;
-	}
+		// Should be used inside grunt.util.async.parallel
+		function bowerList(kind) {
+			return function(callback) {
+				var params = _.extend({}, bowerOptions);
+				params[kind] = true;
 
-	function findMainFiles(name, component) {
-		// Bower knows main JS file?
-		var mainFiles = ensureArray(component);
-		var mainJSFiles = _.filter(mainFiles, isJsFile);
-		if (mainJSFiles.length) {
-			return mainJSFiles;
+				bower.commands.list(params)
+					.on('error', grunt.fatal.bind(grunt.fail))
+					.on('end', function(data) {
+						callback(null, data);  // null means "no error" for async.parallel
+					});
+			};
 		}
 
-		// Try to find main JS file
-		var jsFiles = grunt.file.expand(path.join(component, '*.js'));
+		function resolveDependencies(map) {
+			var dependencyGraph = dependencies || {};
+			var resolved = [];
+			var unresolved = [];
 
-		// Skip Gruntfiles
-		jsFiles = _.filter(jsFiles, function(filepath) {
-			return !/(Gruntfile\.js)|(grunt\.js)$/.test(filepath);
-		});
+			// Build dependency graph:
+			if (map.dependencies) {
+				dependencyTools.buildDependencyGraph(
+					undefined,  // First recursion without a start value
+					map.dependencies,
+					dependencyGraph
+				);
 
-		if (jsFiles.length === 1) {
-			// Only one JS file: no doubt it’s main file
-			return jsFiles;
+				// Flatten/resolve the dependency tree:
+				dependencyTools.resolveDependencyGraph(
+					undefined,  // First recursion without a start value
+					resolved,
+					unresolved,
+					dependencyGraph
+				);
+			}
+
+			return resolved;
 		}
-		else {
-			// More than one JS file: try to guess
-			var bestFile = guessBestFile(name, jsFiles);
-			if (bestFile) {
-				return [bestFile];
+
+		function findMainFiles(name, component) {
+			// Bower knows main JS file?
+			var mainFiles = ensureArray(component);
+			var mainJSFiles = _.filter(mainFiles, isJsFile);
+			if (mainJSFiles.length) {
+				return mainJSFiles;
+			}
+
+			// Try to find main JS file
+			var jsFiles = grunt.file.expand(path.join(component, '*.js'));
+
+			// Skip Gruntfiles
+			jsFiles = _.filter(jsFiles, function(filepath) {
+				return !/(Gruntfile\.js)|(grunt\.js)$/.test(filepath);
+			});
+
+			if (jsFiles.length === 1) {
+				// Only one JS file: no doubt it’s main file
+				return jsFiles;
 			}
 			else {
-				return [];
-			}
-		}
-	}
-
-	function getNpmPackage(name, component) {
-		var pkg = findPackage(name, component);
-		if (!pkg) return null;
-
-		var mainjs = path.join(pkg, 'lib/main.js');
-		if (!fs.existsSync(mainjs)) return null;
-
-		return requirePackage(pkg, mainjs);
-	}
-
-	function findPackage(name, component) {
-		var packages = grunt.file.expand(path.join(component, 'packages/*'));
-		if (packages.length === 0) {
-			// No packages found
-			return null;
-		}
-		else if (packages.length === 1) {
-			// Only one package: return it
-			return packages[0];
-		}
-		else {
-			// More than one package: try to guess
-			return guessBestFile(name, packages);
-		}
-	}
-
-	function requirePackage(pkg, mainjs) {
-		var processed = {};
-		var pkgName = path.basename(pkg);
-		var code = grunt.file.read(mainjs);
-		while (true) {
-			var requires = detective(code);
-			if (!requires.length) break;
-			for (var requireIdx in requires) {
-				var name = requires[requireIdx];
-				var requiredCode = '';
-				if (!processed[name]) {
-					var filepath = path.join(pkg, 'lib', name.replace(pkgName + '/', '') + '.js');
-					requiredCode = grunt.file.read(filepath);
-					processed[name] = true;
+				// More than one JS file: try to guess
+				var bestFile = guessBestFile(name, jsFiles);
+				if (bestFile) {
+					return [bestFile];
 				}
-				code = code.replace(new RegExp('require\\([\\\'\"]' + name + '[\\\'\"]\\);?'), requiredCode);
+				else {
+					return [];
+				}
 			}
 		}
-		return code;
-	}
 
-	// Computing Levenshtein distance to guess a main file
-	// Based on https://github.com/curist/grunt-bower
-	function guessBestFile(componentName, files) {
-		var minDist = 1e13;
-		var minDistIndex = -1;
+		function getNpmPackage(name, component) {
+			var pkg = findPackage(name, component);
+			if (!pkg) return null;
 
-		files.sort(function(a, b) {
-			// Reverse order by path length
-			return b.length - a.length;
-		});
+			var mainjs = path.join(pkg, 'lib/main.js');
+			if (!fs.existsSync(mainjs)) return null;
 
-		files.forEach(function(filepath, i) {
-			var filename = path.basename(filepath, '.js');
-			var dist = _.str.levenshtein(componentName, filename);
-			if (dist <= minDist) {
-				minDist = dist;
-				minDistIndex = i;
+			return requirePackage(pkg, mainjs);
+		}
+
+		function findPackage(name, component) {
+			var packages = grunt.file.expand(path.join(component, 'packages/*'));
+			if (packages.length === 0) {
+				// No packages found
+				return null;
 			}
-		});
-
-		if (minDistIndex !== -1) {
-			return files[minDistIndex];
+			else if (packages.length === 1) {
+				// Only one package: return it
+				return packages[0];
+			}
+			else {
+				// More than one package: try to guess
+				return guessBestFile(name, packages);
+			}
 		}
-		else {
-			return undefined;
+
+		function requirePackage(pkg, mainjs) {
+			var processed = {};
+			var pkgName = path.basename(pkg);
+			var code = grunt.file.read(mainjs);
+			while (true) {
+				var requires = detective(code);
+				if (!requires.length) break;
+				for (var requireIdx in requires) {
+					var name = requires[requireIdx];
+					var requiredCode = '';
+					if (!processed[name]) {
+						var filepath = path.join(pkg, 'lib', name.replace(pkgName + '/', '') + '.js');
+						requiredCode = grunt.file.read(filepath);
+						processed[name] = true;
+					}
+					code = code.replace(new RegExp('require\\([\\\'\"]' + name + '[\\\'\"]\\);?'), requiredCode);
+				}
+			}
+			return code;
 		}
-	}
 
-	function ensureArray(object) {
-		if (Array.isArray(object))
-			return object;
-		else
-			return [object];
-	}
+		// Computing Levenshtein distance to guess a main file
+		// Based on https://github.com/curist/grunt-bower
+		function guessBestFile(componentName, files) {
+			var minDist = 1e13;
+			var minDistIndex = -1;
 
-	function isJsFile(filepath) {
-		return typeof filepath === 'string' && fs.lstatSync(filepath).isFile() && path.extname(filepath) === '.js';
-	}
+			files.sort(function(a, b) {
+				// Reverse order by path length
+				return b.length - a.length;
+			});
 
+			files.forEach(function(filepath, i) {
+				var filename = path.basename(filepath, '.js');
+				var dist = _.str.levenshtein(componentName, filename);
+				if (dist <= minDist) {
+					minDist = dist;
+					minDistIndex = i;
+				}
+			});
+
+			if (minDistIndex !== -1) {
+				return files[minDistIndex];
+			}
+			else {
+				return undefined;
+			}
+		}
+
+		function ensureArray(object) {
+			if (Array.isArray(object))
+				return object;
+			else
+				return [object];
+		}
+
+		function isJsFile(filepath) {
+			return typeof filepath === 'string' && fs.lstatSync(filepath).isFile() && path.extname(filepath) === '.js';
+		}
+
+	});
 };
