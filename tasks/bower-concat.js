@@ -26,6 +26,7 @@ module.exports = function(grunt) {
 		var dependencies = this.data.dependencies || {};
 		var mains = this.data.mainFiles || {};
 		var bowerOptions = this.data.bowerOptions || {};
+    var useMinFiles = this.data.useMin || true;
 
 		var done = this.async();
 
@@ -146,6 +147,10 @@ module.exports = function(grunt) {
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
+
+			if(useMinFiles) {
+				mainJSFiles = useMinJSFiles(mainJSFiles);
+			}
 			if (mainJSFiles.length) {
 				return mainJSFiles;
 			}
@@ -260,5 +265,32 @@ module.exports = function(grunt) {
 			return typeof filepath === 'string' && fs.existsSync(filepath) && fs.lstatSync(filepath).isFile() && path.extname(filepath) === '.js';
 		}
 
+		function useMinJSFiles(files) {
+			var tempMinFilePath;
+
+			for(var i = 0; i < files.length; ++i) {
+				tempMinFilePath = minFilepath(files[i]);
+
+				if(tempMinFilePath) {
+					files[i] = tempMinFilePath;
+				}
+				else {
+					consolo.log('Unable to find minified:' + files[i]);
+				}
+			}
+			return files;
+		}
+
+		// Try {path}/{filenanme}.min.js, common standard
+		function minFilepath(filepath) {
+
+			if(!isJsFile(filepath)) {
+				return null;
+			}
+
+			var minFilepath = path.join(path.dirname(filepath), path.basename(filepath, '.js')) + '.min.js'
+
+			return isJsFile(minFilepath) ? minFilepath : null;
+		}
 	});
 };
