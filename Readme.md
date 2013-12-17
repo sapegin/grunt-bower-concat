@@ -1,4 +1,7 @@
-# Bower components concatenator for Grunt [![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
+# Bower components builder for Grunt
+
+[![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
+[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Automatic concatenation of installed [Bower](https://github.com/twitter/bower) components in right order.
 
