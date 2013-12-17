@@ -26,7 +26,7 @@ module.exports = function(grunt) {
 		var dependencies = this.data.dependencies || {};
 		var mains = this.data.mainFiles || {};
 		var bowerOptions = this.data.bowerOptions || {};
-    var useMinFiles = this.data.useMin || true;
+    var useMinFiles = this.data.useMinified || false;
 
 		var done = this.async();
 
