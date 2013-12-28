@@ -146,7 +146,7 @@ module.exports = function(grunt) {
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
 			mainFiles = _.map(mainFiles, function(filepath) {
-				return path.join(bower.config.cwd, filepath)
+				return path.join(bower.config.cwd, filepath);
 			});
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
