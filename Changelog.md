@@ -1,3 +1,7 @@
+### 2013-12-29 v0.2.3
+
+* Respect `cwd` option of `.bowerrc` (by [@philippbosch](https://github.com/philippbosch)).
+
 ### 2013-12-17 v0.2.2
 
 * Fix bad path passed as a main file in the bower.json (by [@kaseyq](https://github.com/kaseyq)).
