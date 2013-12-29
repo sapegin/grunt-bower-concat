@@ -74,7 +74,7 @@ module.exports = function(grunt) {
 							jsFiles[name] = pkg;
 						}
 						else {
-							grunt.fatal('Can’t detect main file for "' + name + '" component. ' +
+							grunt.fail.fatal('Can’t detect main file for "' + name + '" component. ' +
 								'You should explicitly define it via bower_concat’s mainFiles option. ' +
 								'See Readme for details.'
 								);
@@ -101,7 +101,7 @@ module.exports = function(grunt) {
 				params[kind] = true;
 
 				bower.commands.list(params)
-					.on('error', grunt.fatal.bind(grunt.fail))
+					.on('error', grunt.fail.fatal.bind(grunt.fail))
 					.on('end', function(data) {
 						callback(null, data);  // null means "no error" for async.parallel
 					});
