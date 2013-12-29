@@ -138,20 +138,23 @@ module.exports = function(grunt) {
 			if (mains[name]) {
 				var manualMainFiles = ensureArray(mains[name]);
 				manualMainFiles = _.map(manualMainFiles, function(filepath) {
-					return path.join(component, filepath);
+					return path.join(bower.config.cwd, component, filepath);
 				});
 				return manualMainFiles;
 			}
 
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
+			mainFiles = _.map(mainFiles, function(filepath) {
+				return path.join(bower.config.cwd, filepath);
+			});
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
 				return mainJSFiles;
 			}
 
 			// Try to find main JS file
-			var jsFiles = grunt.file.expand(path.join(component, '*.js'));
+			var jsFiles = grunt.file.expand(path.join(bower.config.cwd, component, '*.js'));
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
