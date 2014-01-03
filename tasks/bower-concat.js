@@ -139,9 +139,10 @@ module.exports = function(grunt) {
 			if (mains[name]) {
 				var manualMainFiles = ensureArray(mains[name]);
 				manualMainFiles = ensureArray(manualMainFiles.map(function(filepath) {
-					if(component.substr(0,bower.config.cwd.length) === bower.config.cwd){
+					if (component.substr(0,bower.config.cwd.length) === bower.config.cwd){
 						return path.join(component, filepath);
-					} else {
+					}
+					else {
 						return path.join(bower.config.cwd, component, filepath);
 					}
 				}));
@@ -151,9 +152,10 @@ module.exports = function(grunt) {
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
 			mainFiles = mainFiles.map(function(filepath) {
-				if(filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
+				if (filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
 					return filepath;
-				} else {
+				}
+				else {
 					return path.join(bower.config.cwd, filepath);
 				}
 			});
@@ -165,17 +167,20 @@ module.exports = function(grunt) {
 
 			// Try to find main JS file
 			var jsFiles = [];
-			if(component && component instanceof Array && component.length > 0){
-				jsFiles = component.map(function(filepath){
-					if(filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
+			if (component && component instanceof Array && component.length > 0){
+				jsFiles = component.map(function(filepath) {
+					if (filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
 						return grunt.file.expand(path.join(filepath, '*.js'));
-					} else {
+					}
+					else {
 						return grunt.file.expand(path.join(bower.config.cwd, filepath, '*.js'));
 					}
 				});
-			} else if(component.substr(0,bower.config.cwd.length) === bower.config.cwd){
+			}
+			else if (component.substr(0,bower.config.cwd.length) === bower.config.cwd){
 				jsFiles = grunt.file.expand(path.join(component, '*.js'));
-			} else {
+			}
+			else {
 				grunt.file.expand(path.join(bower.config.cwd, component, '*.js'));
 			}
 
