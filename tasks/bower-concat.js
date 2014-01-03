@@ -62,6 +62,7 @@ module.exports = function(grunt) {
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
 					var mainFiles = findMainFiles(name, component);
+
 					if (mainFiles.length) {
 						jsFiles[name] = mainFiles.map(function(file) {
 							return grunt.file.read(file);
@@ -137,24 +138,46 @@ module.exports = function(grunt) {
 			// Main file explicitly defined in bower_concat options
 			if (mains[name]) {
 				var manualMainFiles = ensureArray(mains[name]);
-				manualMainFiles = _.map(manualMainFiles, function(filepath) {
-					return path.join(bower.config.cwd, component, filepath);
-				});
+				manualMainFiles = ensureArray(manualMainFiles.map(function(filepath) {
+					if(component.substr(0,bower.config.cwd.length) === bower.config.cwd){
+						return path.join(component, filepath);
+					} else {
+						return path.join(bower.config.cwd, component, filepath);
+					}
+				}));
 				return manualMainFiles;
 			}
 
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
-			mainFiles = _.map(mainFiles, function(filepath) {
-				return path.join(bower.config.cwd, filepath);
+			mainFiles = mainFiles.map(function(filepath) {
+				if(filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
+					return filepath;
+				} else {
+					return path.join(bower.config.cwd, filepath);
+				}
 			});
+
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
 				return mainJSFiles;
 			}
 
 			// Try to find main JS file
-			var jsFiles = grunt.file.expand(path.join(bower.config.cwd, component, '*.js'));
+			var jsFiles = [];
+			if(component && component instanceof Array && component.length > 0){
+				jsFiles = component.map(function(filepath){
+					if(filepath.substr(0,bower.config.cwd.length) === bower.config.cwd){
+						return grunt.file.expand(path.join(filepath, '*.js'));
+					} else {
+						return grunt.file.expand(path.join(bower.config.cwd, filepath, '*.js'));
+					}
+				});
+			} else if(component.substr(0,bower.config.cwd.length) === bower.config.cwd){
+				jsFiles = grunt.file.expand(path.join(component, '*.js'));
+			} else {
+				grunt.file.expand(path.join(bower.config.cwd, component, '*.js'));
+			}
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
