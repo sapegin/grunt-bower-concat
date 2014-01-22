@@ -28,18 +28,18 @@
     "node": "*"
   },
   "dependencies": {
-    "bower": "~1.2.7",
-    "detective": "~2.1.2",
-    "lodash": "~2.3.0",
+    "bower": "~1.2.8",
+    "detective": "~2.3.0",
+    "lodash": "~2.4.1",
     "underscore.string": "~2.3.3"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-jshint": "~0.7.1",
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.8.0",
     "grunt-contrib-clean": "~0.5.0",
-    "grunt-mocha-test": "~0.7.0",
+    "grunt-mocha-test": "~0.8.2",
     "matchdep": "~0.3.0",
-    "grunt-jscs-checker": "~0.2.4"
+    "grunt-jscs-checker": "~0.3.2"
   },
   "peerDependencies": {
     "grunt": "~0.4.0"
