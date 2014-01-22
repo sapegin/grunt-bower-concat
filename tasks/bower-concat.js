@@ -25,6 +25,7 @@ module.exports = function(grunt) {
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
 		var mains = this.data.mainFiles || {};
+		var callback = this.data.callback;
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 
@@ -64,6 +65,7 @@ module.exports = function(grunt) {
 
 					var mainFiles = findMainFiles(name, component);
 					if (mainFiles.length) {
+						if (callback) mainFiles = callback(mainFiles, name);
 						jsFiles[name] = mainFiles.map(function(file) {
 							return grunt.file.read(file);
 						});
@@ -97,14 +99,14 @@ module.exports = function(grunt) {
 
 		// Should be used inside grunt.util.async.parallel
 		function bowerList(kind) {
-			return function(callback) {
+			return function(done) {
 				var params = _.extend({}, bowerOptions);
 				params[kind] = true;
 
 				bower.commands.list(params)
 					.on('error', grunt.fail.fatal.bind(grunt.fail))
 					.on('end', function(data) {
-						callback(null, data);  // null means "no error" for async.parallel
+						done(null, data);  // null means "no error" for async.parallel
 					});
 			};
 		}

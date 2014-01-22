@@ -2,6 +2,8 @@
 module.exports = function(grunt) {
 	'use strict';
 
+	var _ = require('lodash');
+
 	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
 
 	grunt.initConfig({
@@ -29,6 +31,23 @@ module.exports = function(grunt) {
 				},
 				bowerOptions: {
 					relative: false
+				}
+			},
+			callback: {
+				dest: 'test/tmp/callback.js',
+				exclude: 'jquery',
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				},
+				mainFiles: {
+				  'svg.js': 'dist/svg.js'
+				},
+				callback: function(mainFiles, component) {
+					return _.map(mainFiles, function(filepath) {
+						var min = filepath.replace(/\.js$/, '.min.js');
+						return grunt.file.exists(min) ? min : filepath;
+					});
 				}
 			}
 		},

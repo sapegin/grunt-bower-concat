@@ -86,11 +86,27 @@ mainFiles: {
 }
 ```
 
+#### callback
+
+Type: `Function`, optional.
+
+This function will be called for every Bower component and allows you to change main files chosen by `bower-concat`.
+
+```js
+callback: function(mainFiles, component) {
+  return _.map(mainFiles, function(filepath) {
+  	// Use minified files is available
+    var min = filepath.replace(/\.js$/, '.min.js');
+    return grunt.file.exists(min) ? min : filepath;
+  });
+}
+```
+
 #### bowerOptions
 
 Type: `Object`, optional.
 
-Bower specific options that will be passed in during the bower.commands calls.
+Bower specific options that will be passed in during the `bower.commands` calls.
 
 ```js
 bowerOptions: {
