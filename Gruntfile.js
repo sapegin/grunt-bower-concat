@@ -6,8 +6,8 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		bower_concat: {
-			all: {
-				dest: 'test/tmp/_bower.js',
+			basic: {
+				dest: 'test/tmp/basic.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -15,6 +15,20 @@ module.exports = function(grunt) {
 				},
 				mainFiles: {
 				  'svg.js': 'dist/svg.js'
+				}
+			},
+			nonrelative: {
+				dest: 'test/tmp/nonrelative.js',
+				exclude: 'jquery',
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				},
+				mainFiles: {
+				  'svg.js': 'dist/svg.js'
+				},
+				bowerOptions: {
+					relative: false
 				}
 			}
 		},

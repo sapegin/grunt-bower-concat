@@ -26,6 +26,7 @@ module.exports = function(grunt) {
 		var dependencies = this.data.dependencies || {};
 		var mains = this.data.mainFiles || {};
 		var bowerOptions = this.data.bowerOptions || {};
+		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 
 		var done = this.async();
 
@@ -138,7 +139,7 @@ module.exports = function(grunt) {
 			if (mains[name]) {
 				var manualMainFiles = ensureArray(mains[name]);
 				manualMainFiles = _.map(manualMainFiles, function(filepath) {
-					return path.join(bower.config.cwd, component, filepath);
+					return path.join(bowerDir, component, filepath);
 				});
 				return manualMainFiles;
 			}
@@ -146,7 +147,7 @@ module.exports = function(grunt) {
 			// Bower knows main JS file?
 			var mainFiles = ensureArray(component);
 			mainFiles = _.map(mainFiles, function(filepath) {
-				return path.join(bower.config.cwd, filepath);
+				return path.join(bowerDir, filepath);
 			});
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
@@ -154,7 +155,7 @@ module.exports = function(grunt) {
 			}
 
 			// Try to find main JS file
-			var jsFiles = grunt.file.expand(path.join(bower.config.cwd, component, '*.js'));
+			var jsFiles = grunt.file.expand(path.join(bowerDir, component, '*.js'));
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
