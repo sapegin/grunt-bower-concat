@@ -1,0 +1,13 @@
+{
+  "name": "svg.js",
+  "homepage": "https://github.com/wout/svg.js",
+  "_release": "v0.32",
+  "_resolution": {
+    "type": "tag",
+    "tag": "v0.32",
+    "commit": "2942e015a826e126d4c6bd4a5ae4a8f95673d0b0"
+  },
+  "_source": "git://github.com/wout/svg.js.git",
+  "_target": "v0.32",
+  "_originalSource": "svg.js"
+}
