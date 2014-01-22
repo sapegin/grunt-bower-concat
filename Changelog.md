@@ -1,3 +1,8 @@
+### 2014-01-22 v0.2.4
+
+* `callback` option.
+* Fix path duplication when `relative` is `false` in `bowerOptions` (#15).
+
 ### 2013-12-29 v0.2.3
 
 * Respect `cwd` option of `.bowerrc` (by [@philippbosch](https://github.com/philippbosch)).
