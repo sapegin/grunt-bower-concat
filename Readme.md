@@ -95,7 +95,7 @@ This function will be called for every Bower component and allows you to change 
 ```js
 callback: function(mainFiles, component) {
   return _.map(mainFiles, function(filepath) {
-  	// Use minified files is available
+  	// Use minified files if available
     var min = filepath.replace(/\.js$/, '.min.js');
     return grunt.file.exists(min) ? min : filepath;
   });
