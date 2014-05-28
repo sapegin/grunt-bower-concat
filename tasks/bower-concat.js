@@ -137,22 +137,33 @@ module.exports = function(grunt) {
 		}
 
 		function findMainFiles(name, component) {
+			grunt.verbose.writeln();
+			grunt.verbose.writeln('Finding main file for ' + name + '...');
+			var mainFiles = ensureArray(component);
+
 			// Main file explicitly defined in bower_concat options
 			if (mains[name]) {
+				// Component could be either filename or folder, we need folder
+				var componentDir = mainFiles[0];
+				if (fs.lstatSync(path.join(bowerDir, componentDir)).isFile()) {
+					componentDir = path.dirname(componentDir);
+				}
+
 				var manualMainFiles = ensureArray(mains[name]);
 				manualMainFiles = _.map(manualMainFiles, function(filepath) {
-					return path.join(bowerDir, component, filepath);
+					return path.join(bowerDir, componentDir, filepath);
 				});
+				grunt.verbose.writeln('Main file was specified in bower_concat options: ' + manualMainFiles);
 				return manualMainFiles;
 			}
 
 			// Bower knows main JS file?
-			var mainFiles = ensureArray(component);
 			mainFiles = _.map(mainFiles, function(filepath) {
 				return path.join(bowerDir, filepath);
 			});
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
+				grunt.verbose.writeln('Main file was specified in bower.json: ' + mainJSFiles);
 				return mainJSFiles;
 			}
 
@@ -166,15 +177,18 @@ module.exports = function(grunt) {
 
 			if (jsFiles.length === 1) {
 				// Only one JS file: no doubt it’s main file
+				grunt.verbose.writeln('Considering the only JS file in a component’s folder as a main file: ' + jsFiles);
 				return jsFiles;
 			}
 			else {
 				// More than one JS file: try to guess
 				var bestFile = guessBestFile(name, jsFiles);
 				if (bestFile) {
+					grunt.verbose.writeln('Guessing the best JS file in a component’s folder: ' + [bestFile]);
 					return [bestFile];
 				}
 				else {
+					grunt.verbose.writeln('Main file not found');
 					return [];
 				}
 			}
