@@ -168,7 +168,9 @@ module.exports = function(grunt) {
 			}
 
 			// Try to find main JS file
-			var jsFiles = grunt.file.expand(path.join(bowerDir, component, '*.js'));
+			var jsFiles = expandForAll(component, function(componentPart) {
+				return path.join(bowerDir, componentPart, '*.js');
+			});
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
@@ -205,7 +207,10 @@ module.exports = function(grunt) {
 		}
 
 		function findPackage(name, component) {
-			var packages = grunt.file.expand(path.join(component, 'packages/*'));
+			var packages = expandForAll(component, function(componentPart) {
+				return path.join(componentPart, 'packages/*');
+			});
+
 			if (packages.length === 0) {
 				// No packages found
 				return null;
@@ -274,6 +279,14 @@ module.exports = function(grunt) {
 				return object;
 			else
 				return [object];
+		}
+
+		function expandForAll(array, makeMask) {
+			var files = [];
+			ensureArray(array).forEach(function(item) {
+				files = files.concat(grunt.file.expand(makeMask(item)));
+			});
+			return files;
 		}
 
 		function isJsFile(filepath) {
