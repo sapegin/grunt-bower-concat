@@ -63,7 +63,7 @@ module.exports = function(grunt) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
-					var mainFiles = findMainFiles(name, component);
+					var mainFiles = findMainFiles(name, component, lists.map.dependencies[name]);
 					if (mainFiles.length) {
 						if (callback) mainFiles = callback(mainFiles, name);
 						jsFiles[name] = mainFiles.map(function(file) {
@@ -136,31 +136,22 @@ module.exports = function(grunt) {
 			return resolved;
 		}
 
-		function findMainFiles(name, component) {
+		function findMainFiles(name, component, meta) {
 			grunt.verbose.writeln();
 			grunt.verbose.writeln('Finding main file for ' + name + '...');
 			var mainFiles = ensureArray(component);
 
 			// Main file explicitly defined in bower_concat options
 			if (mains[name]) {
-				// Component could be either filename or folder, we need folder
-				var componentDir = mainFiles[0];
-				if (fs.lstatSync(path.join(bowerDir, componentDir)).isFile()) {
-					componentDir = path.dirname(componentDir);
-				}
-
+				var componentDir = meta.canonicalDir;
 				var manualMainFiles = ensureArray(mains[name]);
-				manualMainFiles = _.map(manualMainFiles, function(filepath) {
-					return path.join(bowerDir, componentDir, filepath);
-				});
+				manualMainFiles = _.map(manualMainFiles, joinWith(componentDir));
 				grunt.verbose.writeln('Main file was specified in bower_concat options: ' + manualMainFiles);
 				return manualMainFiles;
 			}
 
 			// Bower knows main JS file?
-			mainFiles = _.map(mainFiles, function(filepath) {
-				return path.join(bowerDir, filepath);
-			});
+			mainFiles = _.map(mainFiles, joinWith(bowerDir));
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
 				grunt.verbose.writeln('Main file was specified in bower.json: ' + mainJSFiles);
@@ -168,9 +159,7 @@ module.exports = function(grunt) {
 			}
 
 			// Try to find main JS file
-			var jsFiles = expandForAll(component, function(componentPart) {
-				return path.join(bowerDir, componentPart, '*.js');
-			});
+			var jsFiles = expandForAll(component, joinWith(bowerDir, '*.js'));
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
@@ -207,9 +196,7 @@ module.exports = function(grunt) {
 		}
 
 		function findPackage(name, component) {
-			var packages = expandForAll(component, function(componentPart) {
-				return path.join(componentPart, 'packages/*');
-			});
+			var packages = expandForAll(component, joinWith(null, 'packages/*'));
 
 			if (packages.length === 0) {
 				// No packages found
@@ -287,6 +274,14 @@ module.exports = function(grunt) {
 				files = files.concat(grunt.file.expand(makeMask(item)));
 			});
 			return files;
+		}
+
+		function joinWith(prepend, append) {
+			return function(pathPart) {
+				// path.join(prepend..., pathPart, append...)
+				var params = ensureArray(prepend || []).concat([pathPart], ensureArray(append || []));
+				return path.join.apply(path, params);
+			};
 		}
 
 		function isJsFile(filepath) {
