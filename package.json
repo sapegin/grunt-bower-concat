@@ -1,7 +1,7 @@
 {
   "name": "grunt-bower-concat",
   "description": "Automatic concatenation of installed Bower components in right order.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "homepage": "https://github.com/sapegin/grunt-bower-concat",
   "author": {
     "name": "Artem Sapegin",
