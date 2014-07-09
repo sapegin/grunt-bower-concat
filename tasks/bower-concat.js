@@ -145,13 +145,13 @@ module.exports = function(grunt) {
 			if (mains[name]) {
 				var componentDir = meta.canonicalDir;
 				var manualMainFiles = ensureArray(mains[name]);
-				manualMainFiles = _.map(manualMainFiles, joinWith(componentDir));
+				manualMainFiles = _.map(manualMainFiles, joinPathWith(componentDir));
 				grunt.verbose.writeln('Main file was specified in bower_concat options: ' + manualMainFiles);
 				return manualMainFiles;
 			}
 
 			// Bower knows main JS file?
-			mainFiles = _.map(mainFiles, joinWith(bowerDir));
+			mainFiles = _.map(mainFiles, joinPathWith(bowerDir));
 			var mainJSFiles = _.filter(mainFiles, isJsFile);
 			if (mainJSFiles.length) {
 				grunt.verbose.writeln('Main file was specified in bower.json: ' + mainJSFiles);
@@ -159,7 +159,7 @@ module.exports = function(grunt) {
 			}
 
 			// Try to find main JS file
-			var jsFiles = expandForAll(component, joinWith(bowerDir, '*.js'));
+			var jsFiles = expandForAll(component, joinPathWith(bowerDir, '*.js'));
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
@@ -196,7 +196,7 @@ module.exports = function(grunt) {
 		}
 
 		function findPackage(name, component) {
-			var packages = expandForAll(component, joinWith(null, 'packages/*'));
+			var packages = expandForAll(component, joinPathWith(null, 'packages/*'));
 
 			if (packages.length === 0) {
 				// No packages found
@@ -276,7 +276,7 @@ module.exports = function(grunt) {
 			return files;
 		}
 
-		function joinWith(prepend, append) {
+		function joinPathWith(prepend, append) {
 			return function(pathPart) {
 				// path.join(prepend..., pathPart, append...)
 				var params = ensureArray(prepend || []).concat([pathPart], ensureArray(append || []));
