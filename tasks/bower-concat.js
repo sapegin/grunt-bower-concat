@@ -13,6 +13,7 @@ module.exports = function(grunt) {
 	var fs = require('fs');
 	var bower = require('bower');
 	var detective = require('detective');
+	var async = require('async');
 	var _ = require('lodash');
 	_.str = require('underscore.string');
 	var dependencyTools = require('../lib/dependencyTools');
@@ -49,7 +50,7 @@ module.exports = function(grunt) {
 		 * @param {Function} allDone function(bowerFiles) {}
 		 */
 		function bowerJavaScripts(allDone) {
-			grunt.util.async.parallel({
+			async.parallel({
 				map: bowerList('map'),
 				components: bowerList('paths')
 			}, function(err, lists) {
