@@ -42,6 +42,12 @@ module.exports = function(grunt) {
 			done();
 		});
 
+
+		/**
+		 * Finds suitable JS files for all installed Bower packages.
+		 *
+		 * @param {Function} allDone function(bowerFiles) {}
+		 */
 		function bowerJavaScripts(allDone) {
 			grunt.util.async.parallel({
 				map: bowerList('map'),
@@ -97,7 +103,13 @@ module.exports = function(grunt) {
 			});
 		}
 
-		// Should be used inside grunt.util.async.parallel
+		/**
+		 * Returns function that invokes `list` command of Bower API.
+		 * Should be used inside async.parallel.
+		 *
+		 * @param {String} kind map|paths
+		 * @return {Function}
+		 */
 		function bowerList(kind) {
 			return function(done) {
 				var params = _.extend({}, bowerOptions);
@@ -110,12 +122,19 @@ module.exports = function(grunt) {
 			};
 		}
 
+		/**
+		 * Builds dependency graph.
+		 * See lib/dependencyTools.js.
+		 *
+		 * @param {Object} map Map from bower.commands.list(kind: map).
+		 * @return {Array}
+		 */
 		function resolveDependencies(map) {
 			var dependencyGraph = dependencies || {};
 			var resolved = [];
 			var unresolved = [];
 
-			// Build dependency graph:
+			// Build dependency graph
 			if (map.dependencies) {
 				dependencyTools.buildDependencyGraph(
 					undefined,  // First recursion without a start value
@@ -123,7 +142,7 @@ module.exports = function(grunt) {
 					dependencyGraph
 				);
 
-				// Flatten/resolve the dependency tree:
+				// Flatten/resolve the dependency tree
 				dependencyTools.resolveDependencyGraph(
 					undefined,  // First recursion without a start value
 					resolved,
@@ -135,6 +154,14 @@ module.exports = function(grunt) {
 			return resolved;
 		}
 
+		/**
+		 * Finds main JS files for a component.
+		 *
+		 * @param {String} name Component name.
+		 * @param {Array|String} component Item from bower.commands.list(kind: list).
+		 * @param {Object} meta Item from bower.commands.list(kind: map).
+		 * @return {Array}
+		 */
 		function findMainFiles(name, component, meta) {
 			grunt.verbose.writeln();
 			grunt.verbose.writeln('Finding main file for ' + name + '...');
@@ -184,6 +211,13 @@ module.exports = function(grunt) {
 			}
 		}
 
+		/**
+		 * Returns concatenated npm package source code (tries to find package and concatenates source code).
+		 *
+		 * @param {String} name Component name.
+		 * @param {Array|String} component Item from bower.commands.list(kind: list).
+		 * @return {String}
+		 */
 		function getNpmPackage(name, component) {
 			var pkg = findPackage(name, component);
 			if (!pkg) return null;
@@ -194,6 +228,13 @@ module.exports = function(grunt) {
 			return requirePackage(pkg, mainjs);
 		}
 
+		/**
+		 * Returns package path (packages/component-name/).
+		 *
+		 * @param {String} name Component name.
+		 * @param {Array|String} component Item from bower.commands.list(kind: list).
+		 * @return {String}
+		 */
 		function findPackage(name, component) {
 			var packages = expandForAll(component, joinPathWith(null, 'packages/*'));
 
@@ -211,6 +252,14 @@ module.exports = function(grunt) {
 			}
 		}
 
+		/**
+		 * Returns concatenated package source code.
+		 * Expands all `require()`s.
+		 *
+		 * @param {String} pkg Package path.
+		 * @param {String} mainjs Main JS file path.
+		 * @return {String}
+		 */
 		function requirePackage(pkg, mainjs) {
 			var processed = {};
 			var pkgName = path.basename(pkg);
@@ -232,8 +281,14 @@ module.exports = function(grunt) {
 			return code;
 		}
 
-		// Computing Levenshtein distance to guess a main file
-		// Based on https://github.com/curist/grunt-bower
+		/**
+		 * Computing Levenshtein distance to guess a main file.
+		 * Based on https://github.com/curist/grunt-bower
+		 *
+		 * @param {String} componentName Component name.
+		 * @param {Array} files List of all possible main files.
+		 * @return {String}
+		 */
 		function guessBestFile(componentName, files) {
 			var minDist = 1e13;
 			var minDistIndex = -1;
@@ -260,6 +315,12 @@ module.exports = function(grunt) {
 			}
 		}
 
+		/**
+		 * Returns an array as is, converts any other type to an array: [source].
+		 *
+		 * @param {Mixed} object
+		 * @return {Array}
+		 */
 		function ensureArray(object) {
 			if (Array.isArray(object))
 				return object;
@@ -267,6 +328,13 @@ module.exports = function(grunt) {
 				return [object];
 		}
 
+		/**
+		 * Runs grunt.file.expand for every array item and returns combined array.
+		 *
+		 * @param {Array|String} array Masks (can be single string mask).
+		 * @param {Function} makeMask function(mask) { return mask; }
+		 * @return {Array} All found files.
+		 */
 		function expandForAll(array, makeMask) {
 			var files = [];
 			ensureArray(array).forEach(function(item) {
@@ -275,6 +343,13 @@ module.exports = function(grunt) {
 			return files;
 		}
 
+		/**
+		 * Path joiner function factory. Returns function that prepends `pathPart` with `prepend` and appends it with `append`.
+		 *
+		 * @param  {Array|String} [prepend] Path parts that will be added before `pathPart`.
+		 * @param  {Array|String} [append] Path parts that will be added after `pathPart`.
+		 * @return {Function} function(pathPart) {}
+		 */
 		function joinPathWith(prepend, append) {
 			return function(pathPart) {
 				// path.join(prepend..., pathPart, append...)
@@ -283,6 +358,12 @@ module.exports = function(grunt) {
 			};
 		}
 
+		/**
+		 * Check whether specified path exists, is a file and has .js extension.
+		 *
+		 * @param {String} filepath Path of a file.
+		 * @return {Boolean}
+		 */
 		function isJsFile(filepath) {
 			return typeof filepath === 'string' && fs.existsSync(filepath) && fs.lstatSync(filepath).isFile() && path.extname(filepath) === '.js';
 		}
