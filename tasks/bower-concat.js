@@ -102,8 +102,7 @@ module.exports = function(grunt) {
 			return function(done) {
 				var params = _.extend({}, bowerOptions);
 				params[kind] = true;
-
-				bower.commands.list(params)
+				bower.commands.list(params, {offline: true})
 					.on('error', grunt.fail.fatal.bind(grunt.fail))
 					.on('end', function(data) {
 						done(null, data);  // null means "no error" for async.parallel
