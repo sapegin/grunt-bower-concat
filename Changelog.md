@@ -1,3 +1,7 @@
+### 2014-07-10 v0.3.0
+
+* Use Bower in offline mode (fix #20). Do not require internet and faster.
+
 ### 2014-07-09 v0.2.5
 
 * Bug fixes.
