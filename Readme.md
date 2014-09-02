@@ -64,7 +64,7 @@ include: [
 
 Type: `Object`, optional.
 
-Unfortunately not all Bower components list their dependencies. If comoponents concatenates in wrong order use this option to manually specify dependencies for that components.
+Unfortunately not all Bower components list their dependencies. If components concatenate in the wrong order, use this option to manually specify dependencies for those components.
 
 ```js
 dependencies: {
