@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		bower_concat: {
 			basic: {
-				dest: 'test/tmp/basic.js',
+				jsDest: 'test/tmp/basic.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 				}
 			},
 			nonrelative: {
-				dest: 'test/tmp/nonrelative.js',
+				jsDest: 'test/tmp/nonrelative.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 				}
 			},
 			callback: {
-				dest: 'test/tmp/callback.js',
+				jsDest: 'test/tmp/callback.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -48,6 +48,26 @@ module.exports = function(grunt) {
 						var min = filepath.replace(/\.js$/, '.min.js');
 						return grunt.file.exists(min) ? min : filepath;
 					});
+				}
+			},
+			withCss: {
+				jsDest: 'test/tmp/with-css.js',
+				cssDest: 'test/tmp/with-css.css',
+				exclude: 'jquery',
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				},
+				mainFiles: {
+				  'svg.js': 'dist/svg.js',
+				  'social-likes': ['social-likes.min.js', 'social-likes.css']
+				}
+			},
+			onlyCss: {
+				cssDest: 'test/tmp/with-css.css',
+				exclude: 'svg.js',
+				mainFiles: {
+				  'social-likes': ['social-likes.css']
 				}
 			}
 		},

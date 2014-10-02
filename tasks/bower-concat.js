@@ -20,8 +20,12 @@ module.exports = function(grunt) {
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
 		// Options
-		this.requiresConfig([this.name, this.target, 'dest'].join('.'));
-		var dest = this.data.dest;
+		// Require at least one of [`jsDest`, `cssDest`]
+		if (!(this.data.jsDest || this.data.cssDest)) {
+			throw grunt.util.error('Config properties must specify at least one of "jsDest", "cssDest".');
+		}
+		var jsDest = this.data.jsDest;
+		var cssDest = this.data.cssDest;
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
@@ -31,25 +35,35 @@ module.exports = function(grunt) {
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 
 		var done = this.async();
-
-		bowerJavaScripts(function(bowerFiles) {
-			// Concatenate
-			var src = bowerFiles.join(grunt.util.linefeed);
-
-			// Write result
-			grunt.file.write(dest, src);
-			grunt.log.writeln('File ' + dest.cyan + ' created.');
+		bowerMainFiles(function(jsFiles, cssFiles) {
+			if (jsDest && jsFiles && jsFiles.length) {
+				concatenateAndWriteFile(jsFiles, jsDest);
+			}
+			if (cssDest && cssFiles && cssFiles.length) {
+				concatenateAndWriteFile(cssFiles, cssDest);
+			}
 
 			done();
 		});
 
+		/**
+		 * Concatenates and writes a file
+		 *
+		 * @param {Array} files File contents
+		 * @param {String} destination File destination
+		 */
+		function concatenateAndWriteFile(files, destination) {
+			var src = files.join(grunt.util.linefeed);
+			grunt.file.write(destination, src);
+			grunt.log.writeln('File ' + destination.cyan + ' created.');
+		}
 
 		/**
-		 * Finds suitable JS files for all installed Bower packages.
+		 * Finds suitable JS and CSS files for all installed Bower packages.
 		 *
 		 * @param {Function} allDone function(bowerFiles) {}
 		 */
-		function bowerJavaScripts(allDone) {
+		function bowerMainFiles(allDone) {
 			async.parallel({
 				map: bowerList('map'),
 				components: bowerList('paths')
@@ -66,6 +80,7 @@ module.exports = function(grunt) {
 
 				// List of main files
 				var jsFiles = {};
+				var cssFiles = {};
 				_.each(lists.components, function(component, name) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
@@ -73,7 +88,18 @@ module.exports = function(grunt) {
 					var mainFiles = findMainFiles(name, component, lists.map.dependencies[name]);
 					if (mainFiles.length) {
 						if (callback) mainFiles = callback(mainFiles, name);
-						jsFiles[name] = mainFiles.map(function(file) {
+
+						var mainJsFiles = mainFiles.filter(function(file) {
+							return isFileExtension(file, '.js');
+						});
+						var mainCssFiles = mainFiles.filter(function(file) {
+							return isFileExtension(file, '.css');
+						});
+
+						jsFiles[name] = mainJsFiles.map(function(file) {
+							return grunt.file.read(file);
+						});
+						cssFiles[name] = mainCssFiles.map(function(file) {
 							return grunt.file.read(file);
 						});
 					}
@@ -92,15 +118,19 @@ module.exports = function(grunt) {
 					}
 				});
 
-				// Gather JavaScript files by respecting the order of resolved dependencies
-				var modules = [];
+				// Gather files by respecting the order of resolved dependencies
+				var jsModules = [];
+				var cssModules = [];
 				_.each(resolvedDependencies, function(name) {
 					if (jsFiles[name]) {
-						modules = modules.concat(jsFiles[name]);
+						jsModules = jsModules.concat(jsFiles[name]);
+					}
+					if (cssFiles[name]) {
+						cssModules = cssModules.concat(cssFiles[name]);
 					}
 				});
 
-				allDone(modules);
+				allDone(jsModules, cssModules);
 			});
 		}
 
@@ -156,7 +186,7 @@ module.exports = function(grunt) {
 		}
 
 		/**
-		 * Finds main JS files for a component.
+		 * Finds main JS and CSS files for a component.
 		 *
 		 * @param {String} name Component name.
 		 * @param {Array|String} component Item from bower.commands.list(kind: list).
@@ -179,35 +209,43 @@ module.exports = function(grunt) {
 
 			// Bower knows main JS file?
 			mainFiles = _.map(mainFiles, joinPathWith(bowerDir));
-			var mainJSFiles = _.filter(mainFiles, isJsFile);
-			if (mainJSFiles.length) {
-				grunt.verbose.writeln('Main file was specified in bower.json: ' + mainJSFiles);
-				return mainJSFiles;
+			var mainJSFiles = _.filter(mainFiles, function(file) { return isFileExtension(file, '.js'); });
+			var mainCSSFiles = _.filter(mainFiles, function(file) { return isFileExtension(file, '.css'); });
+			var allMainFiles = mainJSFiles.concat(mainCSSFiles);
+
+			if (allMainFiles.length) {
+				grunt.verbose.writeln('Main file was specified in bower.json: ' + allMainFiles);
+				return allMainFiles;
 			}
 
-			// Try to find main JS file
+			// Try to find main JS and CSS files
 			var jsFiles = expandForAll(component, joinPathWith(bowerDir, '*.js'));
+			var cssFiles = expandForAll(component, joinPathWith(bowerDir, '*.css'));
 
 			// Skip Gruntfiles
 			jsFiles = _.filter(jsFiles, function(filepath) {
 				return !/(Gruntfile\.js)|(grunt\.js)$/.test(filepath);
 			});
 
+			var allFiles = jsFiles.concat(cssFiles);
+
 			if (jsFiles.length === 1) {
 				// Only one JS file: no doubt it’s main file
-				grunt.verbose.writeln('Considering the only JS file in a component’s folder as a main file: ' + jsFiles);
-				return jsFiles;
+				grunt.verbose.writeln('Considering the only JS file in a component’s folder ' +
+					 'as a main file: ' + jsFiles
+					  );
+				return allFiles;
 			}
 			else {
 				// More than one JS file: try to guess
 				var bestFile = guessBestFile(name, jsFiles);
 				if (bestFile) {
 					grunt.verbose.writeln('Guessing the best JS file in a component’s folder: ' + [bestFile]);
-					return [bestFile];
+					return [bestFile].concat(cssFiles);
 				}
 				else {
-					grunt.verbose.writeln('Main file not found');
-					return [];
+					grunt.verbose.writeln('Main JS file not found');
+					return cssFiles;
 				}
 			}
 		}
@@ -363,10 +401,13 @@ module.exports = function(grunt) {
 		 * Check whether specified path exists, is a file and has .js extension.
 		 *
 		 * @param {String} filepath Path of a file.
+		 * @param {String} extension Extension to check for, including the`.`.
 		 * @return {Boolean}
 		 */
-		function isJsFile(filepath) {
-			return typeof filepath === 'string' && path.extname(filepath) === '.js' && fs.existsSync(filepath) && fs.lstatSync(filepath).isFile();
+		function isFileExtension(filepath, extension) {
+			return typeof filepath === 'string' && path.extname(filepath) === extension && fs.existsSync(filepath) &&
+				fs.lstatSync(filepath).isFile()
+				;
 		}
 
 	});

@@ -28,11 +28,17 @@ Inside your `Gruntfile.js` file add a section named `bower_concat`. See Paramete
 
 ### Parameters
 
-#### dest
+#### jsDest
 
-Type: `String`.
+Type: `String`, optional (at least one of [`jsDest`, `cssDest`] must exist).
 
-Name of file where result of concatenation will be saved.
+Name of JS file where result of concatenation will be saved.
+
+#### cssDest
+
+Type: `String`, optional (at least one of [`jsDest`, `cssDest`] must exist).
+
+Name of CSS file where result of concatenation will be saved.
 
 #### exclude
 
@@ -82,7 +88,7 @@ Some Bower components don’t list their main files or (more likely) don’t hav
 ```js
 mainFiles: {
   'svg.js': 'dist/svg.js',
-  'mygallery': ['src/base.js', 'src/gallery.js']
+  'mygallery': ['src/base.js', 'src/gallery.js', 'src/style.css']
 }
 ```
 
@@ -120,7 +126,8 @@ bowerOptions: {
 ``` javascript
 bower_concat: {
   all: {
-    dest: 'build/_bower.js',
+    jsDest: 'build/_bower.js',
+	cssDest: 'build/_bower.css',
     exclude: [
     	'jquery',
     	'modernizr'
