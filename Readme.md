@@ -28,15 +28,15 @@ Inside your `Gruntfile.js` file add a section named `bower_concat`. See Paramete
 
 ### Parameters
 
-#### jsDest
+#### dest
 
-Type: `String`, optional (at least one of [`jsDest`, `cssDest`] must exist).
+Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
 
 Name of JS file where result of concatenation will be saved.
 
 #### cssDest
 
-Type: `String`, optional (at least one of [`jsDest`, `cssDest`] must exist).
+Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
 
 Name of CSS file where result of concatenation will be saved.
 
@@ -126,7 +126,7 @@ bowerOptions: {
 ``` javascript
 bower_concat: {
   all: {
-    jsDest: 'build/_bower.js',
+    dest: 'build/_bower.js',
 	cssDest: 'build/_bower.css',
     exclude: [
     	'jquery',

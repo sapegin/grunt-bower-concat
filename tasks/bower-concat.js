@@ -20,11 +20,11 @@ module.exports = function(grunt) {
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
 		// Options
-		// Require at least one of [`jsDest`, `cssDest`]
-		if (!(this.data.jsDest || this.data.cssDest)) {
-			throw grunt.util.error('Config properties must specify at least one of "jsDest", "cssDest".');
+		// Require at least one of [`dest`, `cssDest`]
+		if (!(this.data.dest || this.data.cssDest)) {
+			throw grunt.util.error('Config properties must specify at least one of "dest", "cssDest".');
 		}
-		var jsDest = this.data.jsDest;
+		var jsDest = this.data.dest;
 		var cssDest = this.data.cssDest;
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);

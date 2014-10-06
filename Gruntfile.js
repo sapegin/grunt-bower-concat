@@ -9,7 +9,7 @@ module.exports = function(grunt) {
 	grunt.initConfig({
 		bower_concat: {
 			basic: {
-				jsDest: 'test/tmp/basic.js',
+				dest: 'test/tmp/basic.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 				}
 			},
 			nonrelative: {
-				jsDest: 'test/tmp/nonrelative.js',
+				dest: 'test/tmp/nonrelative.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -34,7 +34,7 @@ module.exports = function(grunt) {
 				}
 			},
 			callback: {
-				jsDest: 'test/tmp/callback.js',
+				dest: 'test/tmp/callback.js',
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -51,7 +51,7 @@ module.exports = function(grunt) {
 				}
 			},
 			withCss: {
-				jsDest: 'test/tmp/with-css.js',
+				dest: 'test/tmp/with-css.js',
 				cssDest: 'test/tmp/with-css.css',
 				exclude: 'jquery',
 				dependencies: {
