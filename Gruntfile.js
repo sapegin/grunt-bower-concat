@@ -49,6 +49,26 @@ module.exports = function(grunt) {
 						return grunt.file.exists(min) ? min : filepath;
 					});
 				}
+			},
+			withCss: {
+				dest: 'test/tmp/with-css.js',
+				cssDest: 'test/tmp/with-css.css',
+				exclude: 'jquery',
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				},
+				mainFiles: {
+				  'svg.js': 'dist/svg.js',
+				  'social-likes': ['social-likes.min.js', 'social-likes.css']
+				}
+			},
+			onlyCss: {
+				cssDest: 'test/tmp/with-css.css',
+				exclude: 'svg.js',
+				mainFiles: {
+				  'social-likes': ['social-likes.css']
+				}
 			}
 		},
 		mochaTest: {
