@@ -19,13 +19,14 @@ module.exports = function(grunt) {
 	var dependencyTools = require('../lib/dependencyTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
-		// Options
-		// Require at least one of [`dest`, `cssDest`]
-		if (!(this.data.dest || this.data.cssDest)) {
-			throw grunt.util.error('Config properties must specify at least one of "dest", "cssDest".');
-		}
 		var jsDest = this.data.dest;
 		var cssDest = this.data.cssDest;
+
+		// Require at least one of [`dest`, `cssDest`]
+		if (!jsDest && !cssDest) {
+			throw grunt.util.error('You should specify "dest" and/or "cssDest" properties in your Gruntfile.');
+		}
+
 		var includes = ensureArray(this.data.include || []);
 		var excludes = ensureArray(this.data.exclude || []);
 		var dependencies = this.data.dependencies || {};
@@ -36,13 +37,8 @@ module.exports = function(grunt) {
 
 		var done = this.async();
 		bowerMainFiles(function(jsFiles, cssFiles) {
-			if (jsDest && jsFiles && jsFiles.length) {
-				concatenateAndWriteFile(jsFiles, jsDest);
-			}
-			if (cssDest && cssFiles && cssFiles.length) {
-				concatenateAndWriteFile(cssFiles, cssDest);
-			}
-
+			concatenateAndWriteFile(jsFiles, jsDest);
+			concatenateAndWriteFile(cssFiles, cssDest);
 			done();
 		});
 
@@ -53,6 +49,8 @@ module.exports = function(grunt) {
 		 * @param {String} destination File destination
 		 */
 		function concatenateAndWriteFile(files, destination) {
+			if (!destination || !files || !files.length) return;
+
 			var src = files.join(grunt.util.linefeed);
 			grunt.file.write(destination, src);
 			grunt.log.writeln('File ' + destination.cyan + ' created.');
@@ -96,12 +94,8 @@ module.exports = function(grunt) {
 							return isFileExtension(file, '.css');
 						});
 
-						jsFiles[name] = mainJsFiles.map(function(file) {
-							return grunt.file.read(file);
-						});
-						cssFiles[name] = mainCssFiles.map(function(file) {
-							return grunt.file.read(file);
-						});
+						jsFiles[name] = mainJsFiles.map(grunt.file.read);
+						cssFiles[name] = mainCssFiles.map(grunt.file.read);
 					}
 					else {
 						// Try to find and concat minispade package: packages/_name_/lib/main.js
@@ -227,27 +221,26 @@ module.exports = function(grunt) {
 				return !/(Gruntfile\.js)|(grunt\.js)$/.test(filepath);
 			});
 
-			var allFiles = jsFiles.concat(cssFiles);
-
+			var mainJsFiles = [];
 			if (jsFiles.length === 1) {
 				// Only one JS file: no doubt it’s main file
 				grunt.verbose.writeln('Considering the only JS file in a component’s folder ' +
 					 'as a main file: ' + jsFiles
 					  );
-				return allFiles;
+				mainJsFiles = jsFiles;
 			}
 			else {
 				// More than one JS file: try to guess
 				var bestFile = guessBestFile(name, jsFiles);
 				if (bestFile) {
 					grunt.verbose.writeln('Guessing the best JS file in a component’s folder: ' + [bestFile]);
-					return [bestFile].concat(cssFiles);
+					mainJsFiles = [bestFile];
 				}
 				else {
 					grunt.verbose.writeln('Main JS file not found');
-					return cssFiles;
 				}
 			}
+			return mainJsFiles.concat(cssFiles);
 		}
 
 		/**
