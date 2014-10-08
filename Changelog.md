@@ -1,3 +1,8 @@
+### 2014-10-08 v0.4.0
+
+* CSS support (by [@kevinschaul](https://github.com/kevinschaul)).
+* Fix undefined `canonicalDir` for packages without `bower.json` (#29).
+
 ### 2014-07-10 v0.3.0
 
 * Use Bower in offline mode (fix #20). Do not require internet and faster.
