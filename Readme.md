@@ -48,8 +48,8 @@ List of components you want to exclude.
 
 ```js
 exclude: [
-	'jquery',
-	'modernizr'
+  'jquery',
+  'modernizr'
 ]
 ```
 
@@ -61,8 +61,8 @@ By default bower-concat will include all installed in project components. Using 
 
 ```js
 include: [
-	'underscore',
-	'backbone'
+  'underscore',
+  'backbone'
 ]
 ```
 
@@ -101,7 +101,7 @@ This function will be called for every Bower component and allows you to change 
 ```js
 callback: function(mainFiles, component) {
   return _.map(mainFiles, function(filepath) {
-  	// Use minified files if available
+    // Use minified files if available
     var min = filepath.replace(/\.js$/, '.min.js');
     return grunt.file.exists(min) ? min : filepath;
   });
@@ -127,10 +127,10 @@ bowerOptions: {
 bower_concat: {
   all: {
     dest: 'build/_bower.js',
-	cssDest: 'build/_bower.css',
+    cssDest: 'build/_bower.css',
     exclude: [
-    	'jquery',
-    	'modernizr'
+      'jquery',
+      'modernizr'
     ],
     dependencies: {
       'underscore': 'jquery',
