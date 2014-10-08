@@ -194,7 +194,7 @@ module.exports = function(grunt) {
 
 			// Main file explicitly defined in bower_concat options
 			if (mains[name]) {
-				var componentDir = meta.canonicalDir;
+				var componentDir = meta && meta.canonicalDir || path.join(bowerDir, component);
 				var manualMainFiles = ensureArray(mains[name]);
 				manualMainFiles = _.map(manualMainFiles, joinPathWith(componentDir));
 				grunt.verbose.writeln('Main file was specified in bower_concat options: ' + manualMainFiles);
