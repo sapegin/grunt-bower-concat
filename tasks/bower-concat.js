@@ -32,6 +32,7 @@ module.exports = function(grunt) {
 		var dependencies = this.data.dependencies || {};
 		var mains = this.data.mainFiles || {};
 		var callback = this.data.callback;
+		var prod = this.data.prod === false ? false : true ;
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 
@@ -70,6 +71,14 @@ module.exports = function(grunt) {
 				if (dependencies) {
 					_.map(dependencies, function(value, key) {
 						dependencies[key] = ensureArray(value);
+					});
+				}
+
+				// Filter dev dependencies unless (data.prod === false)
+				var devDependencies = lists.map.pkgMeta.devDependencies;
+				if (devDependencies && prod) {
+					_.each(Object.keys(devDependencies), function(devDependency) {
+						excludes.push(devDependency);
 					});
 				}
 
