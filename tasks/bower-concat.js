@@ -11,6 +11,7 @@ module.exports = function(grunt) {
 
 	var path = require('path');
 	var fs = require('fs');
+	var filesize = require('filesize');
 	var bower = require('bower');
 	var detective = require('detective');
 	var async = require('async');
@@ -78,7 +79,10 @@ module.exports = function(grunt) {
 
 				// List of main files
 				var jsFiles = {};
+				var allJsFiles = [];
+				var allCssFiles = [];
 				var cssFiles = {};
+
 				_.each(lists.components, function(component, name) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
@@ -93,6 +97,11 @@ module.exports = function(grunt) {
 						var mainCssFiles = mainFiles.filter(function(file) {
 							return isFileExtension(file, '.css');
 						});
+
+						if (grunt.option('verbose')) {
+							allJsFiles = allJsFiles.concat(mainJsFiles.map(_.partial(toFileStats, name)));
+							allCssFiles = allCssFiles.concat(mainCssFiles.map(_.partial(toFileStats, name)));
+						}
 
 						jsFiles[name] = mainJsFiles.map(grunt.file.read);
 						cssFiles[name] = mainCssFiles.map(grunt.file.read);
@@ -111,6 +120,12 @@ module.exports = function(grunt) {
 						}
 					}
 				});
+
+				if (grunt.option('verbose')) {
+					logGroupStats('Scripts', jsDest, allJsFiles);
+					logGroupStats('Styles', cssDest, allCssFiles);
+					grunt.verbose.writeln();
+				}
 
 				// Gather files by respecting the order of resolved dependencies
 				var jsModules = [];
@@ -403,5 +418,59 @@ module.exports = function(grunt) {
 				;
 		}
 
+		/**
+		 * Get size of a file in readable format.
+		 *
+		 * @param {String} filepath Path of a file.
+		 * @param {Object} options [Optional] Filesize function flags.
+		 * @return {String} Readable file size.
+		 */
+		function getFileSize(filepath, options) {
+			var stats = fs.statSync(filepath);
+			return filesize(stats.size, options);
+		}
+
+		/**
+		 * Wrap filepath with related component name and file size.
+		 *
+		 * @param {String} componentName Name of component related to a file.
+		 * @param {String} filepath Path of a file.
+		 * @return {Object} fileStats
+		 */
+		function toFileStats(componentName, filepath) {
+			return {
+				src: path.relative(bowerDir, filepath),
+				component: componentName,
+				size: getFileSize(filepath)
+			};
+		}
+
+		/**
+		 * Verbose print list of files for a group.
+		 *
+		 * @param {String} groupName Name of a files group.
+		 * @param {String} groupDest Path to result of concatenation.
+		 * @param {Array} files List of fileStats
+		 */
+		function logGroupStats(groupName, groupDest, files) {
+			if (!groupDest) {
+				return false;
+			}
+
+			if (!grunt.option('no-color')) {
+				groupDest = groupDest.cyan;
+			}
+
+			grunt.verbose.subhead('%s: -> %s', groupName, groupDest);
+
+			files.forEach(function(file) {
+				if (!grunt.option('no-color')) {
+					file.component = file.component.yellow;
+					file.size = file.size.green;
+				}
+
+				grunt.verbose.writeln('  ./%s [%s] - %s', file.src, file.component, file.size);
+			});
+		}
 	});
 };
