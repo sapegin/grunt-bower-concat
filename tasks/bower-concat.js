@@ -122,8 +122,8 @@ module.exports = function(grunt) {
 				});
 
 				if (grunt.option('verbose')) {
-					logGroupStats('javascript', allJsFiles);
-					logGroupStats('css', allCssFiles);
+					logGroupStats('Scripts', jsDest, allJsFiles);
+					logGroupStats('Styles', cssDest, allCssFiles);
 					grunt.verbose.writeln();
 				}
 
@@ -449,15 +449,27 @@ module.exports = function(grunt) {
 		 * Verbose print list of files for a group.
 		 *
 		 * @param {String} groupName Name of a files group.
+		 * @param {String} groupDest Path to result of concatenation.
 		 * @param {Array} files List of fileStats
-		 *
 		 */
-		function logGroupStats(groupName, files) {
-			grunt.verbose.writeln();
-			grunt.verbose.writeln('All %s files:', groupName);
+		function logGroupStats(groupName, groupDest, files) {
+			if (!groupDest) {
+				return false;
+			}
+
+			if (!grunt.option('no-color')) {
+				groupDest = groupDest.cyan;
+			}
+
+			grunt.verbose.subhead('%s: -> %s', groupName, groupDest);
 
 			files.forEach(function(file) {
-				grunt.verbose.writeln('  [%s] %s - %s', file.component, file.src, file.size);
+				if (!grunt.option('no-color')) {
+					file.component = file.component.yellow;
+					file.size = file.size.green;
+				}
+
+				grunt.verbose.writeln('  ./%s [%s] - %s', file.src, file.component, file.size);
 			});
 		}
 	});
