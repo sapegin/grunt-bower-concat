@@ -17,11 +17,6 @@ module.exports = function(grunt) {
 	var async = require('async');
 	var _ = require('lodash');
 	_.str = require('underscore.string');
-
-	var getFileSize = function(filepath) {
-		var stats = fs.statSync(filepath);
-		return stats.size;
-	};
 	var dependencyTools = require('../lib/dependencyTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
@@ -87,16 +82,7 @@ module.exports = function(grunt) {
 				var allJsFiles = [];
 				var allCssFiles = [];
 				var cssFiles = {};
-				var mapFile = function (name, src) {
-					return {
-						src: path.relative(bowerDir, src),
-						component: name,
-						size: filesize(getFileSize(src))
-					};
-				};
-				var logDebugFile = function (file) {
-					grunt.log.debug('    [%s] %s - %s', file.component, file.src, file.size);
-				};
+
 				_.each(lists.components, function(component, name) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
@@ -112,9 +98,10 @@ module.exports = function(grunt) {
 							return isFileExtension(file, '.css');
 						});
 
-						var map = _.partial(mapFile, name);
-						allJsFiles = allJsFiles.concat(mainJsFiles.map(map));
-						allCssFiles = allCssFiles.concat(mainCssFiles.map(map));
+						if (grunt.option('verbose')) {
+							allJsFiles = allJsFiles.concat(mainJsFiles.map(_.partial(toFileStats, name)));
+							allCssFiles = allCssFiles.concat(mainCssFiles.map(_.partial(toFileStats, name)));
+						}
 
 						jsFiles[name] = mainJsFiles.map(grunt.file.read);
 						cssFiles[name] = mainCssFiles.map(grunt.file.read);
@@ -134,12 +121,11 @@ module.exports = function(grunt) {
 					}
 				});
 
-				grunt.log.debug('  Scripts');
-				allJsFiles.forEach(logDebugFile);
-				grunt.log.debug('');
-
-				grunt.log.debug('  Styles');
-				allCssFiles.forEach(logDebugFile);
+				if (grunt.option('verbose')) {
+					logGroupStats('javascript', allJsFiles);
+					logGroupStats('css', allCssFiles);
+					grunt.verbose.writeln();
+				}
 
 				// Gather files by respecting the order of resolved dependencies
 				var jsModules = [];
@@ -432,5 +418,47 @@ module.exports = function(grunt) {
 				;
 		}
 
+		/**
+		 * Get size of a file in readable format.
+		 *
+		 * @param {String} filepath Path of a file.
+		 * @param {Object} options [Optional] Filesize function flags.
+		 * @return {String} Readable file size.
+		 */
+		function getFileSize(filepath, options) {
+			var stats = fs.statSync(filepath);
+			return filesize(stats.size, options);
+		}
+
+		/**
+		 * Wrap filepath with related component name and file size.
+		 *
+		 * @param {String} componentName Name of component related to a file.
+		 * @param {String} filepath Path of a file.
+		 * @return {Object} fileStats
+		 */
+		function toFileStats(componentName, filepath) {
+			return {
+				src: path.relative(bowerDir, filepath),
+				component: componentName,
+				size: getFileSize(filepath)
+			};
+		}
+
+		/**
+		 * Verbose print list of files for a group.
+		 *
+		 * @param {String} groupName Name of a files group.
+		 * @param {Array} files List of fileStats
+		 *
+		 */
+		function logGroupStats(groupName, files) {
+			grunt.verbose.writeln();
+			grunt.verbose.writeln('All %s files:', groupName);
+
+			files.forEach(function(file) {
+				grunt.verbose.writeln('  [%s] %s - %s', file.component, file.src, file.size);
+			});
+		}
 	});
 };
