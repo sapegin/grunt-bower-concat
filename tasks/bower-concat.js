@@ -11,11 +11,17 @@ module.exports = function(grunt) {
 
 	var path = require('path');
 	var fs = require('fs');
+	var filesize = require('filesize');
 	var bower = require('bower');
 	var detective = require('detective');
 	var async = require('async');
 	var _ = require('lodash');
 	_.str = require('underscore.string');
+
+	var getFileSize = function(filepath) {
+		var stats = fs.statSync(filepath);
+		return stats.size;
+	};
 	var dependencyTools = require('../lib/dependencyTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
@@ -78,7 +84,19 @@ module.exports = function(grunt) {
 
 				// List of main files
 				var jsFiles = {};
+				var allJsFiles = [];
+				var allCssFiles = [];
 				var cssFiles = {};
+				var mapFile = function (name, src) {
+					return {
+						src: path.relative(bowerDir, src),
+						component: name,
+						size: filesize(getFileSize(src))
+					};
+				};
+				var logDebugFile = function (file) {
+					grunt.log.debug('    [%s] %s - %s', file.component, file.src, file.size);
+				};
 				_.each(lists.components, function(component, name) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
@@ -93,6 +111,10 @@ module.exports = function(grunt) {
 						var mainCssFiles = mainFiles.filter(function(file) {
 							return isFileExtension(file, '.css');
 						});
+
+						var map = _.partial(mapFile, name);
+						allJsFiles = allJsFiles.concat(mainJsFiles.map(map));
+						allCssFiles = allCssFiles.concat(mainCssFiles.map(map));
 
 						jsFiles[name] = mainJsFiles.map(grunt.file.read);
 						cssFiles[name] = mainCssFiles.map(grunt.file.read);
@@ -111,6 +133,13 @@ module.exports = function(grunt) {
 						}
 					}
 				});
+
+				grunt.log.debug('  Scripts');
+				allJsFiles.forEach(logDebugFile);
+				grunt.log.debug('');
+
+				grunt.log.debug('  Styles');
+				allCssFiles.forEach(logDebugFile);
 
 				// Gather files by respecting the order of resolved dependencies
 				var jsModules = [];
