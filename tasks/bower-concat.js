@@ -79,8 +79,8 @@ module.exports = function(grunt) {
 
 				// List of main files
 				var jsFiles = {};
-				var allJsFiles = [];
-				var allCssFiles = [];
+				var jsGroupStats = [];
+				var cssGroupStats = [];
 				var cssFiles = {};
 
 				_.each(lists.components, function(component, name) {
@@ -99,8 +99,8 @@ module.exports = function(grunt) {
 						});
 
 						if (grunt.option('verbose')) {
-							allJsFiles = allJsFiles.concat(mainJsFiles.map(_.partial(toFileStats, name)));
-							allCssFiles = allCssFiles.concat(mainCssFiles.map(_.partial(toFileStats, name)));
+							jsGroupStats  = jsGroupStats .concat(mainJsFiles.map(_.partial(toFileStats, name)));
+							cssGroupStats = cssGroupStats.concat(mainCssFiles.map(_.partial(toFileStats, name)));
 						}
 
 						jsFiles[name] = mainJsFiles.map(grunt.file.read);
@@ -122,8 +122,8 @@ module.exports = function(grunt) {
 				});
 
 				if (grunt.option('verbose')) {
-					logGroupStats('Scripts', jsDest, allJsFiles);
-					logGroupStats('Styles', cssDest, allCssFiles);
+					logGroupStats('Scripts', jsDest, jsGroupStats);
+					logGroupStats('Styles', cssDest, cssGroupStats);
 					grunt.verbose.writeln();
 				}
 
