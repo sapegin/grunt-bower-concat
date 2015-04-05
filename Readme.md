@@ -32,7 +32,7 @@ Inside your `Gruntfile.js` file add a section named `bower_concat`. See Paramete
 
 Type: `String` Default: `grunt.util.linefeed`
 
-Concatenated files will be joined on this string. If you're post-processing concatenated JavaScript files with a minifier, you may need to use a semicolon ';\n' as the separator.
+Concatenated files will be joined on this string. If you're post-processing concatenated JavaScript files with a minifier, you may need to use a semicolon ';\n' as the separator. Separator is only applied to concatenated JS files.
 
 `options: { separator : ';' }`
 
