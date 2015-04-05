@@ -35,11 +35,13 @@ module.exports = function(grunt) {
 		var callback = this.data.callback;
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
-		var options = this.options();
+		var options = this.options({
+			separator : grunt.util.linefeed
+		});
 
 		var done = this.async();
 		bowerMainFiles(function(jsFiles, cssFiles) {
-			concatenateAndWriteFile(jsFiles, jsDest, true);
+			concatenateAndWriteFile(jsFiles, jsDest, options.separator);
 			concatenateAndWriteFile(cssFiles, cssDest);
 			done();
 		});
@@ -50,10 +52,10 @@ module.exports = function(grunt) {
 		 * @param {Array} files File contents
 		 * @param {String} destination File destination
 		 */
-		function concatenateAndWriteFile(files, destination,useSeparator) {
+		function concatenateAndWriteFile(files, destination, separator) {
 			if (!destination || !files || !files.length) return;
 
-			var src = files.join((useSeparator && options.separator) || grunt.util.linefeed);
+			var src = files.join(separator);
 			grunt.file.write(destination, src);
 			grunt.log.writeln('File ' + destination.cyan + ' created.');
 		}
