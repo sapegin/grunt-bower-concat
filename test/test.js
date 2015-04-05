@@ -121,4 +121,27 @@ describe('grunt-bower-concat', function() {
 			assert.equal(actual, expected, 'CSS concatenatenation works.');
 		});
 	});
+
+	describe('with-separator',function() {
+
+		var separator = ';';
+		var jsDest 		= 'test/tmp/with-separator.js';
+		var control 	= 'test/control/concat-min-with-separator.js';
+		var jsFiles 		= [
+			bowerDir + '/underscore/underscore-min.js',
+			bowerDir + '/backbone/backbone-min.js'
+		];
+
+		it('Should have a control file to compare against.', function(){
+			assert.ok(fs.existsSync(control),'Control file exists.');
+			assert.ok(fs.statSync(control).size,'Control file not empty.');
+		});
+
+		it('Should concatenate minified JS files with semicolon.', function(){
+			var actual		= grunt.util._.map(jsFiles,grunt.file.read).join(separator);
+			var expected 	= grunt.file.read(control);
+			assert.equal(actual, expected, 'Minified JS files concatenated with semicolon');
+		});
+
+	})
 });
