@@ -51,11 +51,12 @@ module.exports = function(grunt) {
 		 *
 		 * @param {Array} files File contents
 		 * @param {String} destination File destination
+		 * @param {String} separator Files joined on this string
 		 */
 		function concatenateAndWriteFile(files, destination, separator) {
 			if (!destination || !files || !files.length) return;
 
-			var src = files.join(separator);
+			var src = files.join(separator || grunt.util.linefeed);
 			grunt.file.write(destination, src);
 			grunt.log.writeln('File ' + destination.cyan + ' created.');
 		}
