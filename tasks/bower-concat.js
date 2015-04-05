@@ -35,6 +35,7 @@ module.exports = function(grunt) {
 		var callback = this.data.callback;
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
+		var options = this.options();
 
 		var done = this.async();
 		bowerMainFiles(function(jsFiles, cssFiles) {
