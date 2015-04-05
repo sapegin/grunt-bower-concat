@@ -36,7 +36,7 @@ module.exports = function(grunt) {
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 		var options = this.options({
-			separator : grunt.util.linefeed
+			separator: grunt.util.linefeed
 		});
 
 		var done = this.async();
