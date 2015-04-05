@@ -35,10 +35,13 @@ module.exports = function(grunt) {
 		var callback = this.data.callback;
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
+		var options = this.options({
+			separator: grunt.util.linefeed
+		});
 
 		var done = this.async();
 		bowerMainFiles(function(jsFiles, cssFiles) {
-			concatenateAndWriteFile(jsFiles, jsDest);
+			concatenateAndWriteFile(jsFiles, jsDest, options.separator);
 			concatenateAndWriteFile(cssFiles, cssDest);
 			done();
 		});
@@ -48,11 +51,12 @@ module.exports = function(grunt) {
 		 *
 		 * @param {Array} files File contents
 		 * @param {String} destination File destination
+		 * @param {String} separator Files joined on this string
 		 */
-		function concatenateAndWriteFile(files, destination) {
+		function concatenateAndWriteFile(files, destination, separator) {
 			if (!destination || !files || !files.length) return;
 
-			var src = files.join(grunt.util.linefeed);
+			var src = files.join(separator || grunt.util.linefeed);
 			grunt.file.write(destination, src);
 			grunt.log.writeln('File ' + destination.cyan + ' created.');
 		}
@@ -241,7 +245,7 @@ module.exports = function(grunt) {
 				// Only one JS file: no doubt it’s main file
 				grunt.verbose.writeln('Considering the only JS file in a component’s folder ' +
 					 'as a main file: ' + jsFiles
-					  );
+						);
 				mainJsFiles = jsFiles;
 			}
 			else {
