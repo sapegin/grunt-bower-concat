@@ -83,8 +83,8 @@ module.exports = function(grunt) {
 
 				// List of main files
 				var jsFiles = {};
-				var jsGroupStats = [];
-				var cssGroupStats = [];
+				var jsGroupStats = {};
+				var cssGroupStats = {};
 				var cssFiles = {};
 
 				_.each(lists.components, function(component, name) {
@@ -103,8 +103,8 @@ module.exports = function(grunt) {
 						});
 
 						if (grunt.option('verbose')) {
-							jsGroupStats  = jsGroupStats .concat(mainJsFiles.map(_.partial(toFileStats, name)));
-							cssGroupStats = cssGroupStats.concat(mainCssFiles.map(_.partial(toFileStats, name)));
+							jsGroupStats[name]  = mainJsFiles.map(_.partial(toFileStats, name));
+							cssGroupStats[name] = mainCssFiles.map(_.partial(toFileStats, name));
 						}
 
 						jsFiles[name] = mainJsFiles.map(grunt.file.read);
@@ -126,8 +126,8 @@ module.exports = function(grunt) {
 				});
 
 				if (grunt.option('verbose')) {
-					logGroupStats('Scripts', jsDest, jsGroupStats);
-					logGroupStats('Styles', cssDest, cssGroupStats);
+					logGroupStats('Scripts', resolvedDependencies, jsDest, jsGroupStats);
+					logGroupStats('Styles', resolvedDependencies, cssDest, cssGroupStats);
 					grunt.verbose.writeln();
 				}
 
@@ -453,10 +453,11 @@ module.exports = function(grunt) {
 		 * Verbose print list of files for a group.
 		 *
 		 * @param {String} groupName Name of a files group.
+		 * @param {Array} groupOrder Order of components.
 		 * @param {String} groupDest Path to result of concatenation.
-		 * @param {Array} files List of fileStats
+		 * @param {Object} files Map of components fileStats
 		 */
-		function logGroupStats(groupName, groupDest, files) {
+		function logGroupStats(groupName, groupOrder, groupDest, files) {
 			if (!groupDest) {
 				return false;
 			}
@@ -467,13 +468,17 @@ module.exports = function(grunt) {
 
 			grunt.verbose.subhead('%s: -> %s', groupName, groupDest);
 
-			files.forEach(function(file) {
-				if (!grunt.option('no-color')) {
-					file.component = file.component.yellow;
-					file.size = file.size.green;
-				}
+			groupOrder.forEach(function(component) {
+				if (_.isArray(files[component]) && files[component].length) {
+					files[component].forEach(function(file) {
+						if (!grunt.option('no-color')) {
+							file.component = file.component.yellow;
+							file.size = file.size.green;
+						}
 
-				grunt.verbose.writeln('  ./%s [%s] - %s', file.src, file.component, file.size);
+						grunt.verbose.writeln('  ./%s [%s] - %s', file.src, file.component, file.size);
+					});
+				}
 			});
 		}
 	});
