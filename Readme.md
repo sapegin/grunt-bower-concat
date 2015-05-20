@@ -130,7 +130,12 @@ bowerOptions: {
   relative: false
 }
 ```
+#### prod
 
+Type: `Boolean`, optional.
+
+This option will filter bower dev dependencies when set to `true`.
+The default value is `true`.
 
 ### Config Example
 
