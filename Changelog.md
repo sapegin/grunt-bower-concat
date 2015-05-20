@@ -1,3 +1,10 @@
+### 2015-05-20 v0.5.0
+
+* [separator](Readme.md#separator) option (by [@epferrari](https://github.com/epferrari)).
+* [includeDev](Readme.md#includedev) option (by [@VincentBiragnet](https://github.com/VincentBiragnet)).
+* Ability to override main file if it was specified in package’s bower.json (by [@cetra3](https://github.com/cetra3)).
+* Pretty output of files which will be concatenated in verbose mode (by [@vstukanov](https://github.com/vstukanov)).
+
 ### 2014-10-08 v0.4.0
 
 * CSS support (by [@kevinschaul](https://github.com/kevinschaul)).
