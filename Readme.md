@@ -130,12 +130,12 @@ bowerOptions: {
   relative: false
 }
 ```
-#### prod
+#### includeDev
 
-Type: `Boolean`, optional.
+Type: `Boolean`, default: `false`.
 
-This option will filter bower dev dependencies when set to `true`.
-The default value is `true`.
+Include `devDependencies` along with regular `dependencies`.
+
 
 ### Config Example
 
