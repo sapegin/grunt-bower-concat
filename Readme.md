@@ -36,6 +36,12 @@ Concatenated files will be joined on this string. If you're post-processing conc
 
 `options: { separator : ';' }`
 
+#### includeWithDependencies
+
+Type: `Boolean`, default: `false`.
+
+True overrides the normal `include` functionality so that dependencies will be included, not just the specified `include` components.
+
 ### Parameters
 
 
@@ -68,7 +74,7 @@ exclude: [
 
 Type: `String|Array`, optional.
 
-By default bower-concat will include all installed in project components. Using `include` option you can manually specify which components should be included.
+By default bower-concat will include all installed in project components. Using `include` option you can manually specify which components should be included. Specifying this will process more like regular concat in that dependencies will not be included automatically.
 
 ```js
 include: [

@@ -37,7 +37,8 @@ module.exports = function(grunt) {
 		var bowerOptions = this.data.bowerOptions || {};
 		var bowerDir = bowerOptions.relative !== false ? bower.config.cwd : '';
 		var options = this.options({
-			separator: grunt.util.linefeed
+			separator: grunt.util.linefeed,
+			includeWithDependencies: false
 		});
 
 		var done = this.async();
@@ -95,7 +96,7 @@ module.exports = function(grunt) {
 				var cssFiles = {};
 
 				_.each(lists.components, function(component, name) {
-					if (includes.length && _.indexOf(includes, name) === -1) return;
+					if (!options.includeWithDependencies && includes.length && _.indexOf(includes, name) === -1) return;
 					if (excludes.length && _.indexOf(excludes, name) !== -1) return;
 
 					var mainFiles = findMainFiles(name, component, lists.map.dependencies[name]);
