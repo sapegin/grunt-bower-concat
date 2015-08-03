@@ -58,7 +58,7 @@ module.exports = function(grunt) {
 		function concatenateAndWriteFile(files, destination, separator) {
 			if (!destination || !files || !files.length) return;
 
-			_.map(files, process);
+			files = _.map(files, process);
 
 			var src = files.join(separator || grunt.util.linefeed);
 			grunt.file.write(destination, src);
