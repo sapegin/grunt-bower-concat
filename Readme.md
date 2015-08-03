@@ -119,6 +119,22 @@ callback: function(mainFiles, component) {
 }
 ```
 
+#### process
+
+Type: `Function`, optional.
+
+This function will be called for every Bower component and allows you to change the contents of every file.
+
+```js
+process: function(src) {
+	// wrap each library in a self executing function with "use strict"
+  return "\n" +
+    ";(function( window, jQuery, angular, undefined ){ \n 'use strict';\n\n" +
+    src +
+    "\n\n}( window, jQuery, angular ));";
+}
+```
+
 #### bowerOptions
 
 Type: `Object`, optional.
