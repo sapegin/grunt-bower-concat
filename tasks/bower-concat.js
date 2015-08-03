@@ -42,9 +42,9 @@ module.exports = function(grunt) {
 		});
 
 		var done = this.async();
-		bowerMainFiles(function(jsFiles, cssFiles, fileName) {
+		bowerMainFiles(function(jsFiles, cssFiles) {
 			concatenateAndWriteFile(jsFiles, jsDest, options.separator);
-			concatenateAndWriteFile(cssFiles, cssDest, null);
+			concatenateAndWriteFile(cssFiles, cssDest);
 			done();
 		});
 
