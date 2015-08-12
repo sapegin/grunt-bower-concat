@@ -69,7 +69,32 @@ module.exports = function(grunt) {
 				mainFiles: {
 				  'social-likes': ['social-likes.css']
 				}
-			}
+			},
+			include: {
+				dest: 'test/tmp/include.js',
+				include: [
+					'backbone',
+					'jquery-mousewheel'
+				],
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				}
+			},
+			/*includeWithDependencies: {
+				dest: 'test/tmp/include-with-deps.js',
+				include: [
+					'backbone',
+					'jquery-mousewheel'
+				],
+				dependencies: {
+					'backbone': 'underscore',
+					'jquery-mousewheel': 'jquery'
+				},
+				options: {
+					includeWithDependencies: true
+				}
+			}*/
 		},
 		mochaTest: {
 			test: {

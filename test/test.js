@@ -122,7 +122,7 @@ describe('grunt-bower-concat', function() {
 		});
 	});
 
-	describe('with-separator',function() {
+	describe('with-separator', function() {
 
 		var separator = ';';
 		var jsDest = 'test/tmp/with-separator.js';
@@ -144,4 +144,48 @@ describe('grunt-bower-concat', function() {
 		});
 
 	})
+
+	describe('include', function() {
+
+		var jsDest = 'test/tmp/include.js';
+		var jsFiles = [
+			bowerDir + '/backbone/backbone.js',
+			bowerDir + '/jquery-mousewheel/jquery.mousewheel.js'
+		];
+
+		it('Should create destination files.', function() {
+			assert.ok(fs.existsSync(jsDest), 'JS dest file exists.');
+		});
+
+		it('Should concatenate Bower components in right order.', function() {
+			var expected = grunt.util._.map(jsFiles, grunt.file.read).join(grunt.util.linefeed);
+			// fs.writeFileSync('test/tmp/include-e.js', expected);
+			var actual = grunt.file.read(jsDest);
+			assert.equal(actual, expected, 'Concatenatenation works.');
+		});
+
+	})
+
+	/*describe('include-with-dependencies', function() {
+
+		var jsDest = 'test/tmp/include.js';
+		var jsFiles = [
+			bowerDir + '/underscore/underscore.js',
+			bowerDir + '/backbone/backbone.js',
+			bowerDir + '/jquery/jquery.js',
+			bowerDir + '/jquery-mousewheel/jquery.mousewheel.js'
+		];
+
+		it('Should create destination files.', function() {
+			assert.ok(fs.existsSync(jsDest), 'JS dest file exists.');
+		});
+
+		it('Should concatenate Bower components in right order.', function() {
+			var expected = grunt.util._.map(jsFiles, grunt.file.read).join(grunt.util.linefeed);
+			// fs.writeFileSync('test/tmp/include-e.js', expected);
+			var actual = grunt.file.read(jsDest);
+			assert.equal(actual, expected, 'Concatenatenation works.');
+		});
+
+	})*/
 });
