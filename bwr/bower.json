@@ -8,6 +8,7 @@
     "jquery-mousewheel": "~3.1.1",
     "backbone": "~0.9.10",
     "underscore": "~1.4.4",
-    "svg.js": "v0.32"
+    "svg.js": "v0.32",
+    "octicons": "~3.1.0"
   }
 }
