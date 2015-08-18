@@ -128,7 +128,7 @@ module.exports = function(grunt) {
 							jsFiles[name] = pkg;
 						}
 						else {
-							grunt.fail.fatal('Can’t detect main file for "' + name + '" component. ' +
+							grunt.log.error('Can’t detect any .js or .css on main files for "' + name + '" component. ' +
 								'You should explicitly define it via bower_concat’s mainFiles option. ' +
 								'See Readme for details.'
 								);
