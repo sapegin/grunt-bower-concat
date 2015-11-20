@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
-Automatic concatenation of installed [Bower](https://github.com/twitter/bower) components (JS and/or CSS) in the right order.
+Automatic concatenation of installed [Bower](https://github.com/bower/bower) components (JS and/or CSS) in the right order.
 
 
 ## Installation
