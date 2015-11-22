@@ -178,7 +178,7 @@ bower_concat: {
 
 ## Changelog
 
-The changelog can be found in the [Changelog.md](Changelog.md) file.
+The changelog can be found on the [Releases page](https://github.com/sapegin/grunt-bower-concat/releases).
 
 ---
 
