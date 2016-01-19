@@ -50,7 +50,7 @@ describe('grunt-bower-concat', function() {
 		var files = [
 			bowerDir + '/underscore/underscore.js',
 			bowerDir + '/backbone/backbone.js',
-			bowerDir + '/jquery-mousewheel/jquery.mousewheel.js',
+			bowerDir + '/jquery-mousewheel/jquery.mousewheel.min.js',
 			bowerDir + '/social-likes/social-likes.min.js',
 			bowerDir + '/svg.js/dist/svg.min.js'
 		];
@@ -61,6 +61,8 @@ describe('grunt-bower-concat', function() {
 		});
 
 		it('Should concatenate Bower components in right order.', function() {
+            var mousewheel = grunt.file.read(files[2]);
+            console.log(mousewheel);
 			var expected = grunt.util._.map(files, grunt.file.read).join(grunt.util.linefeed);
 			var actual = grunt.file.read(dest);
 			assert.equal(actual, expected, 'Concatenatenation works.');
@@ -120,6 +122,27 @@ describe('grunt-bower-concat', function() {
 			var actual = grunt.file.read(cssDest);
 			assert.equal(actual, expected, 'CSS concatenatenation works.');
 		});
+	});
+
+	describe('scss-files', function() {
+		var scssDest = 'test/tmp/scss.scss';
+
+		var scssFiles = [
+			bowerDir + '/octicons/octicons/sprockets-octicons.scss',
+			bowerDir + '/scss-octicons-parent/main.scss'
+		];
+
+		it('should create destination file.', function() {
+			assert.ok(fs.existsSync(scssDest), 'SCSS dest file exists.');
+			assert.ok(fs.statSync(scssDest).size, 'SCSS dest file not empty.');
+		});
+
+		it('Should concatenate Bower SCSS components in right order.', function() {
+			var expected = grunt.util._.map(scssFiles, grunt.file.read).join(grunt.util.linefeed);
+			var actual = grunt.file.read(scssDest);
+			assert.equal(actual, expected, 'SCSS concatenatenation works.');
+		});
+
 	});
 
 	describe('with-separator', function() {

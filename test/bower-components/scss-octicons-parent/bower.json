@@ -1,0 +1,17 @@
+{
+  "name": "scss-octicons-parent",
+  "homepage": "https://github.com/alwin-rewedigital/grunt-bower-concat",
+  "description": "A Test Bower Component to test SCSS concatenation",
+  "main": "main.scss",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "components",
+    "test",
+    "tests"
+  ]
+}
