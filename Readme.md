@@ -1,7 +1,7 @@
 # Bower components builder for Grunt
 
+[![Powered by You](http://sapegin.github.io/powered-by-you/badge.svg)](http://sapegin.github.io/powered-by-you/)
 [![Build Status](https://travis-ci.org/sapegin/grunt-bower-concat.png)](https://travis-ci.org/sapegin/grunt-bower-concat)
-[![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
 Automatic concatenation of installed [Bower](https://github.com/bower/bower) components (JS and/or CSS) in the right order.
 
