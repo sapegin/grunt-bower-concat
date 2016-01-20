@@ -18,14 +18,13 @@ module.exports = function(grunt) {
 	var _ = require('lodash');
 	_.str = require('underscore.string');
 	var dependencyTools = require('../lib/dependencyTools');
+	var configTools = require('../lib/configTools');
 
 	grunt.registerMultiTask('bower_concat', 'Concatenate installed Bower packages.', function() {
-		var jsDest = this.data.dest;
-		var cssDest = this.data.cssDest;
-		var scssDest = this.data.scssDest;
+		var dests = configTools.extractDestData(this.data);
 
 		// Require at least one of [`dest`, `cssDest`, `scssDest`]
-		if (!jsDest && !cssDest && !scssDest) {
+		if (Object.keys(dests).length === 0) {
 			throw grunt.util.error('You should specify "dest" and/or "cssDest" properties in your Gruntfile.');
 		}
 
@@ -42,13 +41,34 @@ module.exports = function(grunt) {
 			separator: grunt.util.linefeed
 		});
 
+		var tasksOpen = dests.length;
+
 		var done = this.async();
-		bowerMainFiles(function(jsFiles, cssFiles, scssFiles) {
-			concatenateAndWriteFile(jsFiles, jsDest, options.separator);
-			concatenateAndWriteFile(cssFiles, cssDest);
-			concatenateAndWriteFile(scssFiles, scssDest);
-			done();
+		dests.forEach(function(destination) {
+			bowerMainFiles(destination, function(files) {
+				var type = destination.assetType;
+				if (type === 'js') {
+					concatenateAndWriteFile(files, destination.path, options.separator);
+				}
+				else {
+					concatenateAndWriteFile(files, destination.path);
+				}
+				taskFinished();
+			});
 		});
+
+		/**
+		 * As all Filetypes are now handled asynchronously this little helper waits
+		 * until every filetype is finished and will than call done()
+		 */
+		function taskFinished() {
+			tasksOpen--;
+			grunt.log.writeln('task finished');
+			if (tasksOpen === 0) {
+				grunt.log.writeln('all task finished');
+				done();
+			}
+		}
 
 		/**
 		 * Concatenates and writes a file
@@ -70,9 +90,10 @@ module.exports = function(grunt) {
 		/**
 		 * Finds suitable JS and CSS files for all installed Bower packages.
 		 *
+		 * @param {Array} Array of Destination Objects [{assetType: {String}, path: {String}}]
 		 * @param {Function} allDone function(bowerFiles) {}
 		 */
-		function bowerMainFiles(allDone) {
+		function bowerMainFiles(destination, allDone) {
 			async.parallel({
 				map: bowerList('map'),
 				components: bowerList('paths')
@@ -94,12 +115,8 @@ module.exports = function(grunt) {
 				var resolvedDependencies = resolveDependencies(lists.map);
 
 				// List of main files
-				var jsFiles = {};
-				var jsGroupStats = {};
-				var cssGroupStats = {};
-				var scssGroupStats = {};
-				var cssFiles = {};
-				var scssFiles = {};
+				var files = {};
+				var groupStats = {};
 
 				_.each(lists.components, function(component, name) {
 					if (includes.length && _.indexOf(includes, name) === -1) return;
@@ -109,34 +126,23 @@ module.exports = function(grunt) {
 					if (mainFiles.length) {
 						if (callback) mainFiles = callback(mainFiles, name);
 
-						var mainJsFiles = mainFiles.filter(function(file) {
-							return isFileExtension(file, '.js');
+						var filteredMainFiles = mainFiles.filter(function(file) {
+							return isFileExtension(file, '.' + destination.assetType);
 						});
-						var mainCssFiles = mainFiles.filter(function(file) {
-							return isFileExtension(file, '.css');
-						});
-						var mainScssFiles = mainFiles.filter(function(file) {
-							return isFileExtension(file, '.scss');
-						});
-
 						if (grunt.option('verbose')) {
-							jsGroupStats[name]  = mainJsFiles.map(_.partial(toFileStats, name));
-							cssGroupStats[name] = mainCssFiles.map(_.partial(toFileStats, name));
-							scssGroupStats[name] = mainScssFiles.map(_.partial(toFileStats, name));
+							groupStats[name]  = filteredMainFiles.map(_.partial(toFileStats, name));
 						}
 
-						jsFiles[name] = mainJsFiles.map(grunt.file.read);
-						cssFiles[name] = mainCssFiles.map(grunt.file.read);
-						scssFiles[name] = mainScssFiles.map(grunt.file.read);
+						files[name] = filteredMainFiles.map(grunt.file.read);
 					}
 					else {
 						// Try to find and concat minispade package: packages/_name_/lib/main.js
 						var pkg = getNpmPackage(name, component);
 						if (pkg) {
-							jsFiles[name] = pkg;
+							files[name] = pkg;
 						}
 						else {
-							grunt.log.error('Can’t detect any .js, .css or .scss on main files for "' + name + '" component. ' +
+							grunt.log.error('Can’t detect any .' + destination.path + ' on main files for "' + name + '" component. ' +
 								'You should explicitly define it via bower_concat’s mainFiles option. ' +
 								'See Readme for details.'
 								);
@@ -145,29 +151,19 @@ module.exports = function(grunt) {
 				});
 
 				if (grunt.option('verbose')) {
-					logGroupStats('Scripts', resolvedDependencies, jsDest, jsGroupStats);
-					logGroupStats('Styles', resolvedDependencies, cssDest, cssGroupStats);
+					logGroupStats(destination.assetType, resolvedDependencies, destination.path, groupStats);
 					grunt.verbose.writeln();
 				}
 
 				// Gather files by respecting the order of resolved dependencies
-				var jsModules = [];
-				var cssModules = [];
-				var scssModules = [];
+				var modules = [];
 				_.each(resolvedDependencies, function(name) {
-					if (jsFiles[name]) {
-						jsModules = jsModules.concat(jsFiles[name]);
+					if (files[name]) {
+						modules = modules.concat(files[name]);
 					}
-					if (cssFiles[name]) {
-						cssModules = cssModules.concat(cssFiles[name]);
-					}
-					if (cssFiles[name]) {
-						scssModules = scssModules.concat(scssFiles[name]);
-					}
-
 				});
 
-				allDone(jsModules, cssModules, scssModules);
+				allDone(modules);
 			});
 		}
 
