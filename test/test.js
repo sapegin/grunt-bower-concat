@@ -62,7 +62,6 @@ describe('grunt-bower-concat', function() {
 
 		it('Should concatenate Bower components in right order.', function() {
             var mousewheel = grunt.file.read(files[2]);
-            console.log(mousewheel);
 			var expected = grunt.util._.map(files, grunt.file.read).join(grunt.util.linefeed);
 			var actual = grunt.file.read(dest);
 			assert.equal(actual, expected, 'Concatenatenation works.');

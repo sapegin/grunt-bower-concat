@@ -38,18 +38,41 @@ Concatenated files will be joined on this string. If you're post-processing conc
 
 ### Parameters
 
-
 #### dest
 
-Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
+Type: `Object`, required. Defines the Filetypes to be concatenated into a destination File.
+Where the key is the Fileextension (without the dot) and the value is the destination File.
+E.g:
+
+```
+dest: {
+    js: 'build/_bower.js',
+    scss: 'build/_bower.scss,
+    coffee: 'build/_bower.coffee
+}
+```
+
+Also this Version still supports this field to be a String, but this is deprecated:
+(Deprecated) Type: `String`, defines into which file all .js Files should be concatenated.
+
 
 Name of JS file where result of concatenation will be saved.
 
 #### cssDest
 
-Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
+Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
 
 Name of CSS file where result of concatenation will be saved.
+
+####  <file extension>Dest
+
+Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
+
+Name of <file extension> file where result of concatenation will be saved. <file extension> can be any file extension (without dots) like: scsss, galen, coffee, ....
+
+#### dest
+
+(Deprecated) Same as jsDest.
 
 #### exclude
 

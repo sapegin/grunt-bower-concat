@@ -51,8 +51,10 @@ module.exports = function(grunt) {
 				}
 			},
 			withCss: {
-				dest: 'test/tmp/with-css.js',
-				cssDest: 'test/tmp/with-css.css',
+				dest: {
+					js: 'test/tmp/with-css.js',
+					css: 'test/tmp/with-css.css'
+				},
 				exclude: 'jquery',
 				dependencies: {
 					'backbone': 'underscore',
@@ -64,14 +66,18 @@ module.exports = function(grunt) {
 				}
 			},
 			onlyCss: {
-				cssDest: 'test/tmp/with-css.css',
+				dest: {
+					css: 'test/tmp/with-css.css'
+				},
 				exclude: 'svg.js',
 				mainFiles: {
 				  'social-likes': ['social-likes.css']
 				}
 			},
 			scss: {
-				scssDest: 'test/tmp/scss.scss'
+				dest: {
+					scss: 'test/tmp/scss.scss'
+				}
 			},
 			include: {
 				dest: 'test/tmp/include.js',
@@ -104,7 +110,7 @@ module.exports = function(grunt) {
 				options: {
 					reporter: 'spec'
 				},
-				src: ['test/*.js']
+				src: ['./test/lib/*.js', './test/*.js']
 			}
 		},
 		jshint: {
