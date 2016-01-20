@@ -63,9 +63,7 @@ module.exports = function(grunt) {
 		 */
 		function taskFinished() {
 			tasksOpen--;
-			grunt.log.writeln('task finished');
 			if (tasksOpen === 0) {
-				grunt.log.writeln('all task finished');
 				done();
 			}
 		}
@@ -142,7 +140,8 @@ module.exports = function(grunt) {
 							files[name] = pkg;
 						}
 						else {
-							grunt.log.error('Can’t detect any .' + destination.path + ' on main files for "' + name + '" component. ' +
+							grunt.log.error('Can’t detect any .' + destination.path + ' on main files for "' +
+								name + '" component. ' +
 								'You should explicitly define it via bower_concat’s mainFiles option. ' +
 								'See Readme for details.'
 								);
