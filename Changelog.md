@@ -1,3 +1,8 @@
+
+### 2016-01-XX v0.7.0
+
+* Enable concatination of any Filetype.
+
 ### 2015-10-20 v0.6.0
 
 * Cmpatibility with Bower dependencies without any .js or .css main file (#55, by [@frontday](https://github.com/frontday)).
