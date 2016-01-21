@@ -58,22 +58,6 @@ Also this Version still supports this field to be a String, but this is deprecat
 
 Name of JS file where result of concatenation will be saved.
 
-#### cssDest
-
-Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
-
-Name of CSS file where result of concatenation will be saved.
-
-####  <file extension>Dest
-
-Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
-
-Name of <file extension> file where result of concatenation will be saved. <file extension> can be any file extension (without dots) like: scsss, galen, coffee, ....
-
-#### dest
-
-(Deprecated) Same as jsDest.
-
 #### exclude
 
 Type: `String|Array`, optional.
