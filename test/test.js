@@ -50,7 +50,7 @@ describe('grunt-bower-concat', function() {
 		var files = [
 			bowerDir + '/underscore/underscore.js',
 			bowerDir + '/backbone/backbone.js',
-			bowerDir + '/jquery-mousewheel/jquery.mousewheel.js',
+			bowerDir + '/jquery-mousewheel/jquery.mousewheel.min.js',
 			bowerDir + '/social-likes/social-likes.min.js',
 			bowerDir + '/svg.js/dist/svg.min.js'
 		];
