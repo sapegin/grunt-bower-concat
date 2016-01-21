@@ -38,18 +38,27 @@ Concatenated files will be joined on this string. If you're post-processing conc
 
 ### Parameters
 
+#### jsDest
 
-#### dest
-
-Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
+Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
 
 Name of JS file where result of concatenation will be saved.
 
 #### cssDest
 
-Type: `String`, optional (at least one of [`dest`, `cssDest`] must exist).
+Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
 
 Name of CSS file where result of concatenation will be saved.
+
+####  <file extension>Dest
+
+Type: `String`, optional (at least one of [`dest`, `cssDest`, <file extension>Dest] must exist).
+
+Name of <file extension> file where result of concatenation will be saved. <file extension> can be any file extension (without dots) like: scsss, galen, coffee, ....
+
+#### dest
+
+(Deprecated) Same as jsDest.
 
 #### exclude
 
