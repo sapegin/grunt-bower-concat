@@ -70,6 +70,9 @@ module.exports = function(grunt) {
 				  'social-likes': ['social-likes.css']
 				}
 			},
+			scss: {
+				scssDest: 'test/tmp/scss.scss'
+			},
 			include: {
 				dest: 'test/tmp/include.js',
 				include: [
@@ -101,7 +104,7 @@ module.exports = function(grunt) {
 				options: {
 					reporter: 'spec'
 				},
-				src: ['test/*.js']
+				src: ['./test/lib/*.js', './test/*.js']
 			}
 		},
 		jshint: {
