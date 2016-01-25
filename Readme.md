@@ -40,8 +40,8 @@ Concatenated files will be joined on this string. If you're post-processing conc
 
 #### dest
 
-Type: `Object`, required. Defines the Filetypes to be concatenated into a destination File.
-Where the key is the Fileextension (without the dot) and the value is the destination File.
+Type: `Object`, required. Defines the filetypes to be concatenated into a destination file.
+Where the key is the file extension (without the dot) and the value is the destination file.
 E.g:
 
 ```
@@ -52,8 +52,8 @@ dest: {
 }
 ```
 
-Also this Version still supports this field to be a String, but this is deprecated:
-(Deprecated) Type: `String`, defines into which file all .js Files should be concatenated.
+Also this version still supports this field to be a String, but this is deprecated:
+(Deprecated) Type: `String`, defines into which file all .js files should be concatenated.
 
 
 Name of JS file where result of concatenation will be saved.
