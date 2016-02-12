@@ -165,8 +165,10 @@ Include `devDependencies` along with regular `dependencies`.
 ``` javascript
 bower_concat: {
   all: {
-    dest: 'build/_bower.js',
-    cssDest: 'build/_bower.css',
+    dest: {
+      'js': 'build/_bower.js',
+      'css': 'build/_bower.css'
+    },
     exclude: [
       'jquery',
       'modernizr'
