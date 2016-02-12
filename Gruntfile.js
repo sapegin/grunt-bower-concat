@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
 	var _ = require('lodash');
 
-	require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+	require('load-grunt-tasks')(grunt);
 
 	grunt.initConfig({
 		bower_concat: {
@@ -89,21 +89,7 @@ module.exports = function(grunt) {
 					'backbone': 'underscore',
 					'jquery-mousewheel': 'jquery'
 				}
-			},
-			/*includeWithDependencies: {
-				dest: 'test/tmp/include-with-deps.js',
-				include: [
-					'backbone',
-					'jquery-mousewheel'
-				],
-				dependencies: {
-					'backbone': 'underscore',
-					'jquery-mousewheel': 'jquery'
-				},
-				options: {
-					includeWithDependencies: true
-				}
-			}*/
+			}
 		},
 		mochaTest: {
 			test: {
