@@ -17,7 +17,8 @@
   "license": "MIT",
   "main": "tasks/bower-concat.js",
   "scripts": {
-    "test": "grunt"
+    "test": "grunt",
+    "pretest": "bower install"
   },
   "engines": {
     "node": ">=0.10.0"
