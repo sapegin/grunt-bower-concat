@@ -24,12 +24,12 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-    "async": "~1.4.2",
-    "bower": "~1.6.3",
-    "detective": "~4.2.0",
-    "lodash": "~3.10.1",
-    "filesize": "~3.1.2",
-    "underscore.string": "~3.2.2"
+    "async": "~1.5.2",
+    "bower": "~1.7.7",
+    "detective": "~4.3.1",
+    "lodash": "~4.3.0",
+    "filesize": "~3.2.1",
+    "underscore.string": "~3.2.3"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -38,8 +38,8 @@
     "grunt-contrib-jshint": "~0.11.2",
     "grunt-jscs": "~2.1.0",
     "grunt-mocha-test": "~0.12.7",
-    "mocha": "~2.3.3"
     "load-grunt-tasks": "~3.4.0",
+    "mocha": "~2.4.5"
   },
   "peerDependencies": {
     "grunt": ">=0.4.0"
