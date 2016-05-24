@@ -47,8 +47,8 @@ E.g:
 ```
 dest: {
     js: 'build/_bower.js',
-    scss: 'build/_bower.scss,
-    coffee: 'build/_bower.coffee
+    scss: 'build/_bower.scss',
+    coffee: 'build/_bower.coffee'
 }
 ```
 
