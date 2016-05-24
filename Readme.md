@@ -44,7 +44,7 @@ Type: `Object`, required. Defines the filetypes to be concatenated into a destin
 Where the key is the file extension (without the dot) and the value is the destination file.
 E.g:
 
-```
+```js
 dest: {
     js: 'build/_bower.js',
     scss: 'build/_bower.scss',
