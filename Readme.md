@@ -25,6 +25,22 @@ grunt.loadNpmTasks('grunt-bower-concat');
 
 Inside your `Gruntfile.js` file add a section named `bower_concat`. See Parameters section below for details.
 
+### Gruntfile.coffee
+
+If you use cofeescript you will want to add somewhere in your `Gruntfile.coffee`:
+```coffeescript
+grunt.loadNpmTasks 'grunt-bower-concat'
+```
+
+In your module config you can add a section like this : 
+
+```coffeescript
+module.exports = (grunt) ->
+  grunt.initConfig
+    bower_concat:
+      all:
+        dest: 'app/lib/bower_components.js'
+```
 
 ### Options
 
